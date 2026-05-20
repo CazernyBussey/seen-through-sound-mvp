@@ -30,7 +30,47 @@ Mission statement:
 - `admin.html` — admin sign-in, brand audio settings, and moderation queue.
 - `admin.js` — Supabase auth, settings, approve/reject actions.
 - `styles.css` — accessible, high-contrast visual design.
-- `supabase-schema.sql` — database, storage, and security policies.
+-
+-
+- ## Setup and configuration
+
+This project relies on a Supabase backend for storing audio files and submission metadata. To make the application fully functional, create a free Supabase account and a new project:
+
+1. Sign up at [supabase.com](https://supabase.com/) and create a new project.
+2. In the project's storage settings, create a bucket named **encouragement-audio**.
+3. In the project's database, run the SQL schema from **supabase‑schema.sql** to create the tables and settings expected by the frontend.
+4. From the Supabase dashboard, copy your project's URL and anon/public API key.
+
+Update the configuration constants in the following JavaScript files:
+
+- `app.js` – set `SUPABASE_URL` and `SUPABASE_ANON_KEY` near the top of the file.
+- `playlist.js` – set `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+- `admin.js` – set `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+
+Without these values the site still loads, but submission, playlist and admin functions will indicate that Supabase is not configured.
+
+## Running locally
+
+For local development you can serve the static files from this repository using any simple HTTP server. For example, with [Node.js](https://nodejs.org) installed run:
+
+```
+np    npx http-server .
+
+or    python3 -m http.server
+
+python3 -m http.server
+```
+
+Then open the printed `http://localhost:8080` or `http://localhost:8000` address in your browser to test the site.
+
+## Deployment
+
+This repository is configured for GitHub Pages (see **Settings → Pages**). To deploy updates:
+
+1. Commit your changes to the `main` branch.
+2. Wait a few minutes for GitHub Pages to rebuild.
+3. Visit `https://<username>.github.io/<repository-name>/` to view the latest version.
+`supabase-schema.sql` — database, storage, and security policies.
 - `netlify.toml` — Netlify deploy config.
 
 ## Free-first setup

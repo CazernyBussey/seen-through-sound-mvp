@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Listen to Encouragement | Seen Through Sound</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="playlist.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Seen Through Sound</p>
+      <h1>Listen to Encouragement</h1>
+      <p class="tagline">Real voices sharing hope, strength, and encouragement.</p>
+    </div>
+    <nav aria-label="Main navigation">
+      <a href="index.html">Record Your Encouragement</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <section class="hero">
+      <h2>Public Encouragement Playlist</h2>
+      <p>Listen to real voices sharing hope, strength, and encouragement. Each message was submitted to uplift, inspire, and remind someone that encouragement does not have to be seen to be felt.</p>
+      <p class="notice">Messages play as a sequence: intro, encouragement message, then outro. This keeps the first version free and simple without requiring heavy audio processing.</p>
+    </section>
+
+    <section class="card" aria-labelledby="playlist-heading">
+      <h2 id="playlist-heading">Approved Messages</h2>
+      <div id="playlistStatus" aria-live="polite">Loading approved messages.</div>
+      <div id="playlist"></div>
+    </section>
+  </main>
+</body>
+</html>

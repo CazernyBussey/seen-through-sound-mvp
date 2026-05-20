@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Review | Seen Through Sound</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="admin.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header">
+    <div>
+      <p class="eyebrow">Seen Through Sound</p>
+      <h1>Admin Review</h1>
+      <p class="tagline">Moderate encouragement messages before they become public.</p>
+    </div>
+    <nav aria-label="Main navigation">
+      <a href="index.html">Record</a>
+      <a href="playlist.html">Playlist</a>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <section class="card" aria-labelledby="login-heading">
+      <h2 id="login-heading">Admin Sign In</h2>
+      <p class="notice">Use an approved admin email in Supabase Auth. This MVP uses Supabase magic-link authentication.</p>
+      <form id="loginForm" class="form">
+        <label for="adminEmail">Admin email</label>
+        <input id="adminEmail" type="email" autocomplete="email" required />
+        <button type="submit">Send Sign-In Link</button>
+      </form>
+      <p id="loginStatus" aria-live="polite"></p>
+    </section>
+
+    <section class="card" aria-labelledby="settings-heading">
+      <h2 id="settings-heading">Brand Audio Settings</h2>
+      <p>Paste public Supabase Storage URLs for your intro and outro audio files.</p>
+      <form id="settingsForm" class="form">
+        <label for="introUrl">Intro audio URL</label>
+        <input id="introUrl" type="url" placeholder="https://..." />
+        <label for="outroUrl">Outro audio URL</label>
+        <input id="outroUrl" type="url" placeholder="https://..." />
+        <button type="submit">Save Intro and Outro URLs</button>
+      </form>
+      <p id="settingsStatus" aria-live="polite"></p>
+    </section>
+
+    <section class="card" aria-labelledby="queue-heading">
+      <h2 id="queue-heading">Pending Review Queue</h2>
+      <p class="notice">Reject anything that does not align with hope, respect, and community uplift.</p>
+      <button id="refreshButton" type="button">Refresh Queue</button>
+      <div id="queueStatus" aria-live="polite">Queue not loaded yet.</div>
+      <div id="queue"></div>
+    </section>
+  </main>
+</body>
+</html>

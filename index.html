@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Seen Through Sound | Even Though I’m Blind Voices Project</title>
+  <meta name="description" content="Record a short message of encouragement through Seen Through Sound, an Even Though I’m Blind Voices Project." />
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+  <header class="site-header" role="banner">
+    <div>
+      <p class="eyebrow">An Even Though I’m Blind Voices Project</p>
+      <h1>Seen Through Sound</h1>
+      <p class="tagline">Encouragement does not have to be seen to be felt.</p>
+    </div>
+    <nav aria-label="Main navigation">
+      <a href="playlist.html">Listen to Encouragement</a>
+      <a href="admin.html">Admin</a>
+    </nav>
+  </header>
+
+  <main id="main" class="container">
+    <section class="hero" aria-labelledby="mission-heading">
+      <h2 id="mission-heading">Speak life into someone’s day.</h2>
+      <p>
+        Seen Through Sound is a voice-powered encouragement platform created by Even Though I’m Blind, Inc. to help people speak life, hope, and strength into one another. Rooted in the perspective of the blind community and shared with the world, it turns simple audio messages into meaningful moments of connection, reminding every listener that encouragement does not have to be seen to be felt.
+      </p>
+    </section>
+
+    <section class="card" aria-labelledby="record-heading">
+      <h2 id="record-heading">Record Your Encouragement</h2>
+      <p id="record-instructions">
+        Record a short message of encouragement. Speak life, hope, strength, or wisdom into someone’s day. Your message may be reviewed and, if approved, shared publicly as part of the Seen Through Sound encouragement playlist.
+      </p>
+
+      <div class="status-panel" aria-live="polite" aria-atomic="true">
+        <p><strong>Status:</strong> <span id="statusText">Ready to record.</span></p>
+        <p><strong>Timer:</strong> <span id="timerText">0 seconds</span></p>
+      </div>
+
+      <div class="controls" role="group" aria-label="Recording controls">
+        <button id="recordButton" type="button">Start Recording</button>
+        <button id="stopButton" type="button" disabled>Stop Recording</button>
+        <button id="resetButton" type="button" disabled>Reset</button>
+      </div>
+
+      <div id="previewWrap" class="preview hidden">
+        <h3>Preview your message</h3>
+        <audio id="previewAudio" controls></audio>
+      </div>
+
+      <form id="submissionForm" class="form" aria-describedby="record-instructions">
+        <label for="speakerName">Your name</label>
+        <input id="speakerName" name="speakerName" type="text" autocomplete="name" placeholder="Example: Cazerny" />
+
+        <label class="checkbox-row">
+          <input id="anonymous" name="anonymous" type="checkbox" />
+          Share my message as anonymous if approved
+        </label>
+
+        <label for="speakerEmail">Email for your approval link</label>
+        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" placeholder="name@example.com" />
+
+        <label for="messageTitle">Short title for your message</label>
+        <input id="messageTitle" name="messageTitle" type="text" maxlength="80" placeholder="Example: Keep going" />
+
+        <label class="checkbox-row">
+          <input id="consent" name="consent" type="checkbox" required />
+          I understand that my submitted audio message may be reviewed by Even Though I’m Blind, Inc. and, if approved, may be shared publicly through Seen Through Sound.
+        </label>
+
+        <button id="submitButton" type="submit" disabled>Submit Message for Review</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Seen Through Sound · An Even Though I’m Blind Voices Project</p>
+  </footer>
+</body>
+</html>

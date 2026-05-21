@@ -52,9 +52,9 @@
       </div>
 
       <div class="controls" role="group" aria-label="Recording controls">
-        <button id="recordButton" type="button" aria-label="Start recording your encouragement message">Start Recording</button>
-        <button id="stopButton" type="button" aria-label="Stop recording and preview your encouragement message" disabled>Stop Recording</button>
-        <button id="resetButton" type="button" aria-label="Clear this recording and start over" disabled>Reset Recording</button>
+        <button id="recordButton" type="button">Start Recording</button>
+        <button id="stopButton" type="button" disabled>Stop Recording</button>
+        <button id="resetButton" type="button" disabled>Reset Recording</button>
       </div>
 
       <div id="previewWrap" class="preview hidden">
@@ -63,11 +63,11 @@
         <audio id="previewAudio" controls aria-label="Preview your recorded encouragement message"></audio>
       </div>
 
-      <form id="submissionForm" class="form" aria-describedby="record-instructions form-help">
+      <form id="submissionForm" class="form">
         <p id="form-help" class="form-help">Your name, email, and title help us review and organize submissions. Your email address will not be published; it may only be used to contact you about your submission.</p>
 
         <label for="speakerName">Your name</label>
-        <input id="speakerName" name="speakerName" type="text" autocomplete="name" placeholder="Example: Cazerny" aria-describedby="name-help" />
+        <input id="speakerName" name="speakerName" type="text" autocomplete="name" placeholder="Example: Cazerny" />
         <p id="name-help" class="form-help">Leave this blank or choose anonymous below if you do not want your name shown with an approved message.</p>
 
         <label class="checkbox-row" for="anonymous">
@@ -76,7 +76,7 @@
         </label>
 
         <label for="speakerEmail">Your email address</label>
-        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" placeholder="name@example.com" aria-describedby="email-help" />
+        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" placeholder="name@example.com" />
         <p id="email-help" class="form-help">Your email is private and will not appear publicly with your message.</p>
 
         <label for="messageTitle">Message title</label>
@@ -87,7 +87,7 @@
           I confirm that I have the right to submit this audio message, and I give Even Though I’m Blind, Inc. permission to review, store, edit for clarity or length, and share it publicly if approved, including online, in promotional materials, and in project storytelling.
         </label>
 
-        <button id="submitButton" type="submit" aria-label="Submit audio message for review" disabled>Submit Audio Message for Review</button>
+        <button id="submitButton" type="submit" disabled>Submit Audio Message for Review</button>
       </form>
     </section>
   </main>

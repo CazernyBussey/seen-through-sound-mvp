@@ -35,10 +35,10 @@
   </g>
 
   <g aria-hidden="true">
-    <path d="M500 222c56 0 95 31 132 62-37 31-76 62-132 62s-95-31-132-62c37-31 76-62 132-62z" fill="#000000"/>
-    <ellipse cx="500" cy="284" rx="48" ry="47" fill="#f8fafc"/>
-    <circle cx="500" cy="284" r="28" fill="#000000"/>
-    <circle cx="515" cy="268" r="9" fill="#f8fafc"/>
+    <path d="M500 165c63 0 111 38 158 78-47 40-95 78-158 78s-111-38-158-78c47-40 95-78 158-78z" fill="#000000"/>
+    <ellipse cx="500" cy="243" rx="52" ry="51" fill="#f8fafc"/>
+    <circle cx="500" cy="243" r="29" fill="#000000"/>
+    <circle cx="516" cy="225" r="9" fill="#f8fafc"/>
   </g>
 
   <g fill="#000000">

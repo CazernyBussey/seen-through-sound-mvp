@@ -29,11 +29,16 @@
   <main id="main" class="container">
     <section class="card" aria-labelledby="login-heading">
       <h2 id="login-heading">Admin Sign In</h2>
-      <p class="notice">Use an approved admin email in Supabase Auth. This MVP uses Supabase magic-link authentication.</p>
+      <p class="notice">Use your approved admin email. A backup verification box is available below if Safari has trouble opening the email confirmation.</p>
       <form id="loginForm" class="form">
         <label for="adminEmail">Admin email</label>
         <input id="adminEmail" type="email" autocomplete="email" required />
         <button type="submit">Send Sign-In Link</button>
+      </form>
+      <form id="verifyForm" class="form">
+        <label for="verifyText">Backup verification text</label>
+        <input id="verifyText" type="text" autocomplete="off" />
+        <button type="submit">Complete Admin Sign In</button>
       </form>
       <p id="loginStatus" aria-live="polite"></p>
     </section>

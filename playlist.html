@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Listen to Encouragement | Seen Through Sound</title>
+  <title>Playlist | Seen Through Sound</title>
   <link rel="icon" href="assets/seen-through-sound-logo.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,26 +16,18 @@
       <img class="brand-logo" src="assets/seen-through-sound-logo.svg" alt="Even Though I’m Blind logo for Seen Through Sound" />
       <div>
         <p class="eyebrow">Seen Through Sound</p>
-        <h1>Listen to Encouragement</h1>
-        <p class="tagline">Real voices sharing hope, strength, and encouragement.</p>
+        <h1>Playlist</h1>
       </div>
     </div>
     <nav aria-label="Main navigation">
       <a href="index.html">Record Your Encouragement</a>
-      <a href="admin.html">Admin</a>
     </nav>
   </header>
 
   <main id="main" class="container">
-    <section class="hero">
-      <h2>Public Encouragement Playlist</h2>
-      <p>Listen to real voices sharing hope, strength, and encouragement.</p>
-      <p class="notice">Approved recordings play one at a time.</p>
-    </section>
-
     <section class="card" aria-labelledby="playlist-heading">
-      <h2 id="playlist-heading">Approved Messages</h2>
-      <div id="playlistStatus" aria-live="polite">Loading approved messages.</div>
+      <h2 id="playlist-heading">Encouragement Playlist</h2>
+      <div id="playlistStatus" aria-live="polite"></div>
       <div id="playlist"></div>
     </section>
   </main>

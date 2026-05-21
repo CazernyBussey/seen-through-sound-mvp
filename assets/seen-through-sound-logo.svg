@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" role="img" aria-labelledby="title desc">
   <title id="title">Seen Through Sound logo</title>
-  <desc id="desc">A gold globe medallion with bold ETIB initials, an eye-shaped emblem above the I, and a blue banner reading Seen Through Sound.</desc>
+  <desc id="desc">A gold globe medallion with bold ETIB initials, a clear eye-shaped emblem above the lettering, and a blue banner reading Seen Through Sound.</desc>
   <defs>
     <radialGradient id="gold" cx="43%" cy="32%" r="68%">
       <stop offset="0" stop-color="#ffe761"/>
@@ -34,15 +34,15 @@
     <path d="M290 456c38-8 67 5 77 40 10 32 45 47 76 35 34-13 68 8 73 42 5 39-30 69-77 71-84 4-142-53-149-188z"/>
   </g>
 
-  <g fill="#000000">
-    <text x="500" y="617" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="338" font-weight="900" letter-spacing="-22">ETIB</text>
+  <g aria-hidden="true">
+    <path d="M500 222c56 0 95 31 132 62-37 31-76 62-132 62s-95-31-132-62c37-31 76-62 132-62z" fill="#000000"/>
+    <ellipse cx="500" cy="284" rx="48" ry="47" fill="#f8fafc"/>
+    <circle cx="500" cy="284" r="28" fill="#000000"/>
+    <circle cx="515" cy="268" r="9" fill="#f8fafc"/>
   </g>
 
-  <g aria-hidden="true">
-    <path d="M501 291c68 0 106 48 144 79-38 31-76 79-144 79s-107-48-145-79c38-31 77-79 145-79z" fill="#000000"/>
-    <ellipse cx="501" cy="370" rx="62" ry="61" fill="#f8fafc"/>
-    <circle cx="501" cy="370" r="38" fill="#000000"/>
-    <circle cx="521" cy="348" r="13" fill="#f8fafc"/>
+  <g fill="#000000">
+    <text x="500" y="617" text-anchor="middle" font-family="Arial Black, Impact, sans-serif" font-size="338" font-weight="900" letter-spacing="-22">ETIB</text>
   </g>
 
   <rect x="150" y="651" width="700" height="75" rx="38" fill="url(#banner)"/>

@@ -5,70 +5,45 @@ const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON
 const playlist = document.getElementById("playlist");
 const playlistStatus = document.getElementById("playlistStatus");
 
-function publicName(item) {
-  if (item.anonymous || !item.speaker_name) return "Anonymous";
-  return item.speaker_name;
-}
-
-function createAudio(label, src) {
-  const wrap = document.createElement("div");
-  const text = document.createElement("p");
-  text.textContent = label;
+function createAudio(src) {
   const audio = document.createElement("audio");
   audio.controls = true;
   audio.src = src;
-  wrap.append(text, audio);
-  return wrap;
+  return audio;
 }
 
 async function loadPlaylist() {
   if (!supabaseClient || SUPABASE_URL.includes("YOUR_") || SUPABASE_ANON_KEY.includes("YOUR_")) {
-    playlistStatus.textContent = "Supabase is not configured yet. Add your Supabase URL and anon key in playlist.js.";
+    playlistStatus.textContent = "Playlist is not available right now.";
     return;
   }
 
   const { data, error } = await supabaseClient
     .from("submissions")
-    .select("id,title,speaker_name,anonymous,original_audio_url,processed_audio_url,share_slug,published_at,approved_at")
+    .select("id,title,original_audio_url,processed_audio_url,published_at")
     .eq("status", "published")
     .order("published_at", { ascending: false });
 
   if (error) {
     console.error(error);
-    playlistStatus.textContent = "Could not load the playlist.";
+    playlistStatus.textContent = "Playlist is not available right now.";
     return;
   }
+
+  playlistStatus.textContent = "";
+  playlist.innerHTML = "";
 
   if (!data || data.length === 0) {
-    playlistStatus.textContent = "No approved messages are published yet.";
     return;
   }
-
-  playlistStatus.textContent = `${data.length} approved message${data.length === 1 ? "" : "s"} available.`;
-  playlist.innerHTML = "";
 
   data.forEach(item => {
     const article = document.createElement("article");
     article.className = "submission-item";
     const heading = document.createElement("h3");
     heading.textContent = item.title || "Encouragement Message";
-    const meta = document.createElement("p");
-    meta.textContent = `Shared by ${publicName(item)}.`;
-    const sequence = document.createElement("div");
-    sequence.className = "audio-sequence";
-
-    sequence.append(createAudio("Encouragement message", item.processed_audio_url || item.original_audio_url));
-
-    const share = document.createElement("button");
-    share.type = "button";
-    share.textContent = "Copy Share Link";
-    share.addEventListener("click", async () => {
-      const url = `${window.location.origin}${window.location.pathname}#${item.share_slug}`;
-      await navigator.clipboard.writeText(url);
-      share.textContent = "Share Link Copied";
-    });
-
-    article.append(heading, meta, sequence, share);
+    const audio = createAudio(item.processed_audio_url || item.original_audio_url);
+    article.append(heading, audio);
     playlist.append(article);
   });
 }

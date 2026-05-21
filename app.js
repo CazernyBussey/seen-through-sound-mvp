@@ -43,14 +43,35 @@ function resetRecording() {
   setStatus("Ready to record.");
 }
 
+function preferredMimeType() {
+  const types = [
+    "audio/mp4",
+    "audio/webm;codecs=opus",
+    "audio/webm",
+    "audio/ogg;codecs=opus",
+    "audio/ogg"
+  ];
+  return types.find(type => window.MediaRecorder?.isTypeSupported?.(type)) || "";
+}
+
 async function startRecording() {
   try {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    chunks = [];
-    mediaRecorder.addEventListener("dataavailable", event => {
-      if (event.data.size > 0) chunks.push(event.data);
+    stream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      }
     });
+
+    const mimeType = preferredMimeType();
+    mediaRecorder = mimeType ? new MediaRecorder(stream, { mimeType }) : new MediaRecorder(stream);
+    chunks = [];
+
+    mediaRecorder.addEventListener("dataavailable", event => {
+      if (event.data && event.data.size > 0) chunks.push(event.data);
+    });
+
     mediaRecorder.addEventListener("stop", () => {
       audioBlob = new Blob(chunks, { type: mediaRecorder.mimeType || "audio/webm" });
       previewAudio.src = URL.createObjectURL(audioBlob);
@@ -60,7 +81,14 @@ async function startRecording() {
       stream?.getTracks().forEach(track => track.stop());
       setStatus("Recording stopped. Preview your message before submitting.");
     });
-    mediaRecorder.start();
+
+    mediaRecorder.addEventListener("error", event => {
+      console.error(event.error || event);
+      setStatus("Recording stopped because the browser reported an audio error. Please try again.");
+      stopRecording();
+    });
+
+    mediaRecorder.start(1000);
     recordButton.disabled = true;
     stopButton.disabled = false;
     resetButton.disabled = true;
@@ -76,12 +104,13 @@ async function startRecording() {
 }
 
 function stopRecording() {
-  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+  clearInterval(timerInterval);
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    mediaRecorder.requestData();
     mediaRecorder.stop();
-    clearInterval(timerInterval);
-    recordButton.disabled = false;
-    stopButton.disabled = true;
   }
+  recordButton.disabled = false;
+  stopButton.disabled = true;
 }
 
 async function submitRecording(event) {
@@ -102,7 +131,7 @@ async function submitRecording(event) {
   const speakerEmail = document.getElementById("speakerEmail").value.trim();
   const messageTitle = document.getElementById("messageTitle").value.trim();
   const anonymous = document.getElementById("anonymous").checked;
-  const extension = audioBlob.type.includes("webm") ? "webm" : "ogg";
+  const extension = audioBlob.type.includes("mp4") ? "m4a" : audioBlob.type.includes("webm") ? "webm" : "ogg";
   const filePath = `pending/${crypto.randomUUID()}.${extension}`;
 
   const { error: uploadError } = await supabaseClient.storage

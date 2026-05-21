@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Seen Through Sound | Even Though I’m Blind Voices Project</title>
-  <meta name="description" content="Record a short message of encouragement through Seen Through Sound, an Even Though I’m Blind Voices Project." />
+  <meta name="description" content="Record a short message of hope, strength, or encouragement through Seen Through Sound, an Even Though I’m Blind Voices Project." />
   <link rel="icon" href="assets/seen-through-sound-logo.svg?v=seen-through-sound-logo-20260521" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -29,32 +29,46 @@
   <main id="main" class="container">
     <section class="hero" aria-labelledby="mission-heading">
       <h2 id="mission-heading">Speak life into someone’s day.</h2>
-      <p>Seen Through Sound is a voice-powered encouragement platform created by Even Though I’m Blind, Inc. to help people speak life, hope, and strength into one another.</p>
+      <p>Your voice could be the reason someone keeps going today. Record a short message of hope, strength, or encouragement for someone who needs a reminder that they matter.</p>
+      <p>Seen Through Sound is a voice-powered encouragement platform created by Even Though I’m Blind, Inc. Submitted messages are reviewed before publication, and only approved messages may be shared publicly as part of the encouragement library.</p>
     </section>
 
     <section class="card" aria-labelledby="record-heading">
       <h2 id="record-heading">Record Your Encouragement</h2>
-      <p id="record-instructions">Record a short message of encouragement. Your message may be reviewed and, if approved, shared publicly.</p>
+      <p id="record-instructions">Record a clear message between 15 and 60 seconds. Before submitting, you can stop, listen, reset, and record again.</p>
 
-      <div class="status-panel">
+      <div class="notice" aria-labelledby="review-heading">
+        <h3 id="review-heading">Before you record</h3>
+        <ul>
+          <li>Messages are reviewed before publication.</li>
+          <li>Not every submitted message will be shared.</li>
+          <li>Please avoid private information, hate speech, profanity, copyrighted music, or anything you do not have permission to share.</li>
+        </ul>
+      </div>
+
+      <div class="status-panel" role="status" aria-live="polite" aria-atomic="true">
         <p><strong>Status:</strong> <span id="statusText">Ready to record.</span></p>
-        <p><strong>Timer:</strong> <span id="timerText" aria-hidden="true">0 seconds</span></p>
+        <p><strong>Timer:</strong> <span id="timerText">0 seconds</span></p>
       </div>
 
       <div class="controls" role="group" aria-label="Recording controls">
         <button id="recordButton" type="button" aria-label="Start recording your encouragement message">Start Recording</button>
-        <button id="stopButton" type="button" aria-label="Stop and preview" disabled>Stop Recording</button>
-        <button id="resetButton" type="button" aria-label="Clear this recording and start over" disabled>Reset</button>
+        <button id="stopButton" type="button" aria-label="Stop recording and preview your encouragement message" disabled>Stop Recording</button>
+        <button id="resetButton" type="button" aria-label="Clear this recording and start over" disabled>Reset Recording</button>
       </div>
 
       <div id="previewWrap" class="preview hidden">
         <h3>Preview your message</h3>
+        <p>Listen to your recording before you submit it for review.</p>
         <audio id="previewAudio" controls aria-label="Preview your recorded encouragement message"></audio>
       </div>
 
-      <form id="submissionForm" class="form">
+      <form id="submissionForm" class="form" aria-describedby="record-instructions form-help">
+        <p id="form-help" class="form-help">Your name, email, and title help us review and organize submissions. Your email address will not be published; it may only be used to contact you about your submission.</p>
+
         <label for="speakerName">Your name</label>
-        <input id="speakerName" name="speakerName" type="text" autocomplete="name" placeholder="Example: Cazerny" />
+        <input id="speakerName" name="speakerName" type="text" autocomplete="name" placeholder="Example: Cazerny" aria-describedby="name-help" />
+        <p id="name-help" class="form-help">Leave this blank or choose anonymous below if you do not want your name shown with an approved message.</p>
 
         <label class="checkbox-row" for="anonymous">
           <input id="anonymous" name="anonymous" type="checkbox" />
@@ -62,17 +76,18 @@
         </label>
 
         <label for="speakerEmail">Your email address</label>
-        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" placeholder="name@example.com" />
+        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" placeholder="name@example.com" aria-describedby="email-help" />
+        <p id="email-help" class="form-help">Your email is private and will not appear publicly with your message.</p>
 
         <label for="messageTitle">Message title</label>
         <input id="messageTitle" name="messageTitle" type="text" maxlength="80" placeholder="Example: Keep going" />
 
         <label class="checkbox-row" for="consent">
           <input id="consent" name="consent" type="checkbox" required />
-          I give permission for my audio message to be reviewed and shared publicly if approved.
+          I confirm that I have the right to submit this audio message, and I give Even Though I’m Blind, Inc. permission to review, store, edit for clarity or length, and share it publicly if approved, including online, in promotional materials, and in project storytelling.
         </label>
 
-        <button id="submitButton" type="submit" aria-label="Submit your encouragement message for review" disabled>Submit Message for Review</button>
+        <button id="submitButton" type="submit" aria-label="Submit audio message for review" disabled>Submit Audio Message for Review</button>
       </form>
     </section>
   </main>

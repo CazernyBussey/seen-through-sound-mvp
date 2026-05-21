@@ -44,6 +44,17 @@ body {
   gap: 1rem;
   align-items: flex-start;
 }
+.brand-lockup {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.brand-logo {
+  width: clamp(4.5rem, 12vw, 7rem);
+  height: auto;
+  flex: 0 0 auto;
+  border-radius: 999px;
+}
 
 nav { display: flex; gap: 1rem; flex-wrap: wrap; }
 a { color: var(--accent); }
@@ -130,6 +141,8 @@ audio { width: 100%; }
 
 @media (max-width: 720px) {
   .site-header { display: block; }
+  .brand-lockup { align-items: flex-start; }
+  .brand-logo { width: 5rem; }
   nav { margin-top: 1rem; }
   .controls button { width: 100%; }
 }

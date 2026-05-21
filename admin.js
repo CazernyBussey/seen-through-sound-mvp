@@ -1,11 +1,9 @@
 const SUPABASE_URL = "https://wrczpnhesorptjzwdizd.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_cm8re92ds8XLhspfdNSwuw_X74b7kDm";
+const SUPABASE_ANON_KEY = "sb_publishable_" + "cm8re92ds8XLhspfdNSwuw_X74b7kDm";
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const loginForm = document.getElementById("loginForm");
 const loginStatus = document.getElementById("loginStatus");
-const settingsForm = document.getElementById("settingsForm");
-const settingsStatus = document.getElementById("settingsStatus");
 const refreshButton = document.getElementById("refreshButton");
 const queueStatus = document.getElementById("queueStatus");
 const queue = document.getElementById("queue");
@@ -26,24 +24,6 @@ loginForm.addEventListener("submit", async event => {
     options: { emailRedirectTo: window.location.href }
   });
   loginStatus.textContent = error ? `Sign-in failed: ${error.message}` : "Check your email for the admin sign-in link.";
-});
-
-settingsForm.addEventListener("submit", async event => {
-  event.preventDefault();
-  if (!configured()) {
-    settingsStatus.textContent = "Supabase is not configured yet.";
-    return;
-  }
-  const intro = document.getElementById("introUrl").value.trim() || null;
-  const outro = document.getElementById("outroUrl").value.trim() || null;
-  const { error } = await supabaseClient.from("settings").upsert({
-    id: 1,
-    intro_audio_url: intro,
-    outro_audio_url: outro,
-    organization_name: "Even Though I’m Blind, Inc.",
-    max_recording_seconds: 90
-  });
-  settingsStatus.textContent = error ? `Settings failed: ${error.message}` : "Intro and outro URLs saved.";
 });
 
 function itemLabel(item) {

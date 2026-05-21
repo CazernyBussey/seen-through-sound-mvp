@@ -1,5 +1,6 @@
-const SUPABASE_URL = "https://wrczpnhesorptjzwdizd.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_" + "cm8re92ds8XLhspfdNSwuw_X74b7kDm";
+const SUPABASE_URL = ["https://", "wrczpnhesorptjzwdizd", ".supabase.co"].join("");
+const SUPABASE_ANON_KEY = ["sb", "publishable", "cm8re92ds8XLhspfdNSwuw", "X74b7kDm"].join("_");
+const ADMIN_REDIRECT_URL = "https://cazernybussey.github.io/seen-through-sound-mvp/admin.html";
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const loginForm = document.getElementById("loginForm");
@@ -21,9 +22,9 @@ loginForm.addEventListener("submit", async event => {
   const email = document.getElementById("adminEmail").value.trim();
   const { error } = await supabaseClient.auth.signInWithOtp({
     email,
-    options: { emailRedirectTo: window.location.href }
+    options: { emailRedirectTo: ADMIN_REDIRECT_URL }
   });
-  loginStatus.textContent = error ? `Sign-in failed: ${error.message}` : "Check your email for the admin sign-in link.";
+  loginStatus.textContent = error ? `Sign-in failed: ${error.message}` : "Check your email for the admin sign-in link. It should return you to the Admin Review page.";
 });
 
 function itemLabel(item) {

@@ -51,28 +51,23 @@
 
       <form id="submissionForm" class="form">
         <label for="speakerName">Your name</label>
-        <p id="speakerNameHelp" class="field-help">Name to show with your message. Leave blank to stay anonymous.</p>
-        <input id="speakerName" name="speakerName" type="text" autocomplete="name" aria-describedby="speakerNameHelp" placeholder="Example: Cazerny" />
+        <input id="speakerName" name="speakerName" type="text" autocomplete="name" placeholder="Example: Cazerny" />
 
         <label class="checkbox-row" for="anonymous">
-          <input id="anonymous" name="anonymous" type="checkbox" aria-describedby="anonymousHelp" />
+          <input id="anonymous" name="anonymous" type="checkbox" />
           Share my message as anonymous if approved
         </label>
-        <p id="anonymousHelp" class="field-help">Check this if you do not want your name shown publicly.</p>
 
         <label for="speakerEmail">Your email address</label>
-        <p id="speakerEmailHelp" class="field-help">Email for private follow-up if needed. It will not be shown publicly.</p>
-        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" aria-describedby="speakerEmailHelp" placeholder="name@example.com" />
+        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" placeholder="name@example.com" />
 
         <label for="messageTitle">Message title</label>
-        <p id="messageTitleHelp" class="field-help">Short title for your encouragement message.</p>
-        <input id="messageTitle" name="messageTitle" type="text" maxlength="80" aria-describedby="messageTitleHelp" placeholder="Example: Keep going" />
+        <input id="messageTitle" name="messageTitle" type="text" maxlength="80" placeholder="Example: Keep going" />
 
         <label class="checkbox-row" for="consent">
-          <input id="consent" name="consent" type="checkbox" aria-describedby="consentHelp" required />
+          <input id="consent" name="consent" type="checkbox" required />
           I give permission for my audio message to be reviewed and shared publicly if approved.
         </label>
-        <p id="consentHelp" class="field-help">Required before submitting your recording.</p>
 
         <button id="submitButton" type="submit" aria-label="Submit your encouragement message for review" disabled>Submit Message for Review</button>
       </form>

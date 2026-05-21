@@ -27,12 +27,6 @@ async function loadPlaylist() {
     return;
   }
 
-  const { data: settings } = await supabaseClient
-    .from("settings")
-    .select("intro_audio_url,outro_audio_url")
-    .eq("id", 1)
-    .maybeSingle();
-
   const { data, error } = await supabaseClient
     .from("submissions")
     .select("id,title,speaker_name,anonymous,original_audio_url,processed_audio_url,share_slug,published_at,approved_at")
@@ -63,13 +57,7 @@ async function loadPlaylist() {
     const sequence = document.createElement("div");
     sequence.className = "audio-sequence";
 
-    if (item.processed_audio_url) {
-      sequence.append(createAudio("Full encouragement message", item.processed_audio_url));
-    } else {
-      if (settings?.intro_audio_url) sequence.append(createAudio("Intro", settings.intro_audio_url));
-      sequence.append(createAudio("Encouragement message", item.original_audio_url));
-      if (settings?.outro_audio_url) sequence.append(createAudio("Outro", settings.outro_audio_url));
-    }
+    sequence.append(createAudio("Encouragement message", item.processed_audio_url || item.original_audio_url));
 
     const share = document.createElement("button");
     share.type = "button";

@@ -1,6 +1,6 @@
-# CFLY Slots: We In Here Edition
+# CFLY Rewards: We In Here Edition
 
-Accessible Cazerny Bussey / CFLY fan reward slot machine game.
+Accessible Cazerny Bussey / CFLY fan reward reel game.
 
 This first version promotes **We In Here** with New York basketball-inspired energy. It is intentionally simple: fans pull the lever, the reels spin, and matching three winning symbols unlocks a reward.
 

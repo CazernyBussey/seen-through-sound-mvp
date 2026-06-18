@@ -3,13 +3,13 @@
     key: 'cfly-fan-unlock-we-in-here-2026-06',
     max: 7,
     delay: 700,
-    files: { link: './assets/rewards/we-in-here-reward-placeholder.txt', name: 'we-in-here-cazerny-bussey-reward.txt' },
+    files: { link: './assets/rewards/we-in-here-reward-placeholder.txt', name: 'cfly-reward.txt' },
     items: [
-      ['we-in-here', 'We In Here', '🎧', true],
-      ['ny-basketball', 'New York basketball', '🏀', true],
+      ['featured-reward', 'Featured reward', '🎁', true],
+      ['music', 'Music', '🎧', true],
       ['cfly-crown', 'CFLY crown', '👑', true],
       ['microphone', 'Microphone', '🎤', false],
-      ['skyline', 'City skyline', '🌆', false],
+      ['spotlight', 'Spotlight', '✨', false],
       ['heart', 'CFLY heart', '🧡', false]
     ]
   };
@@ -25,29 +25,30 @@
     ['triesLeftDisplay','downloadStatusDisplay','soundStatusDisplay','playButton','soundToggle','speechToggle','visibleResult','downloadPanel','downloadTitle','downloadMessage','downloadLink','shareLink','liveRegion','assertiveRegion','playHistory'].forEach(id => nodes[id] = $(id));
     nodes.tiles = [0,1,2].map(i => $(`tile${i}`));
     load();
-    nodes.downloadTitle.textContent = 'You matched three! We in here!';
-    nodes.downloadMessage.textContent = 'CFLY! Your fan download is unlocked. Replace the placeholder file with the official We In Here MP3 before public launch.';
-    nodes.downloadLink.textContent = 'Download We In Here';
+    nodes.downloadTitle.textContent = 'CFLY! You matched three.';
+    nodes.downloadMessage.textContent = 'Your reward is unlocked. Replace the placeholder file with the current monthly reward before public launch.';
+    nodes.downloadLink.textContent = 'Download Reward';
     nodes.downloadLink.href = cfg.files.link;
     nodes.downloadLink.setAttribute('download', cfg.files.name);
-    nodes.shareLink.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent('I just played CFLY Fan Unlock: We In Here Edition by Cazerny Bussey.')}&url=${encodeURIComponent(location.href)}`;
+    nodes.shareLink.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent('I just played CFLY Rewards by Cazerny Bussey.')}&url=${encodeURIComponent(location.href)}`;
     nodes.playButton.addEventListener('click', play);
     nodes.soundToggle.addEventListener('click', () => { state.sound = !state.sound; save(); draw(); say(state.sound ? 'Sound is on.' : 'Sound is off.'); });
     nodes.speechToggle.addEventListener('click', () => { state.speech = !state.speech; if (!state.speech && speechSynthesis) speechSynthesis.cancel(); save(); draw(); say(state.speech ? 'Game voice is on.' : 'Game voice is off. Screen reader text will still update.'); });
     draw();
-    say('Welcome to CFLY Fan Unlock: We In Here Edition. Press play to begin.', true);
+    say('Welcome to CFLY Rewards. Let’s see what you unlock today.', true);
   }
 
   async function play() {
     if (state.busy) return;
-    if (state.done) { openPanel(); say('Your fan download is already unlocked. CFLY forever loves you.', true); return; }
+    if (state.done) { openPanel(); say('Your reward is already unlocked. CFLY forever loves you.', true); return; }
     if (left() <= 0) { result('Your plays are finished for today. Come back tomorrow.'); say('Your plays are finished for today. Come back tomorrow.', true, true); tone('low'); return; }
     state.busy = true;
     state.used += 1;
     save(); draw();
-    if (left() === 0) say('This is your last play for today.', true);
+    if (left() === 0) say('This is your last play for today. Make it count.', true);
     moving(true);
     result('The tiles are moving.');
+    say('The tiles are moving. Let’s see what you get.', true);
     tone('start');
     await wait(cfg.delay);
     const picked = build(left() === 0 && !state.done);
@@ -56,8 +57,8 @@
     const ok = picked.every(x => x[0] === picked[0][0]) && picked[0][3];
     state.history.unshift({ labels: picked.map(x => x[1]), ok });
     state.history = state.history.slice(0, 6);
-    if (ok) { state.done = true; result(`Tile one is ${picked[0][1]}, tile two is ${picked[1][1]}, tile three is ${picked[2][1]}. CFLY! You matched three. We in here. Your fan download is unlocked.`); tone('high'); openPanel(); say('CFLY! You matched three. We in here. Your fan download is unlocked.', true, true); }
-    else { result(`${picked.map((x,i)=>`tile ${i+1} is ${x[1]}`).join(', ')}. Not this play. Run it back. You have ${left()} ${left() === 1 ? 'play' : 'plays'} left today.`); tone('low'); }
+    if (ok) { state.done = true; result(`Tile one is ${picked[0][1]}, tile two is ${picked[1][1]}, tile three is ${picked[2][1]}. CFLY! You matched three. Your reward is unlocked.`); tone('high'); openPanel(); say('CFLY! You matched three. Your reward is unlocked.', true, true); }
+    else { result(`${picked.map((x,i)=>`tile ${i+1} is ${x[1]}`).join(', ')}. Not this time. Run it back. You have ${left()} ${left() === 1 ? 'play' : 'plays'} left today.`); tone('low'); say('Not this time. Run it back.', true); }
     state.busy = false;
     save(); draw();
     nodes.visibleResult.focus({ preventScroll: false });
@@ -69,7 +70,7 @@
   function moving(on) { nodes.tiles.forEach(n => { n.classList.toggle('moving', on); if (on) { const s = pick(cfg.items); n.querySelector('.tile-emoji').textContent = s[2]; n.querySelector('.tile-label').textContent = 'Moving'; } }); }
   function openPanel() { nodes.downloadPanel.hidden = false; nodes.downloadPanel.classList.add('download-visible'); }
   function result(text) { nodes.visibleResult.textContent = text; }
-  function draw() { nodes.triesLeftDisplay.textContent = left(); nodes.downloadStatusDisplay.textContent = state.done ? 'Unlocked' : 'Locked'; nodes.soundStatusDisplay.textContent = state.sound ? 'On' : 'Off'; nodes.playButton.disabled = state.busy || state.done || left() <= 0; nodes.playButton.textContent = state.done ? 'Download Unlocked' : left() <= 0 ? 'No Plays Left' : 'Play'; nodes.soundToggle.textContent = state.sound ? 'Turn Sound Off' : 'Turn Sound On'; nodes.speechToggle.textContent = state.speech ? 'Turn Game Voice Off' : 'Turn Game Voice On'; history(); if (state.done) openPanel(); }
+  function draw() { nodes.triesLeftDisplay.textContent = left(); nodes.downloadStatusDisplay.textContent = state.done ? 'Unlocked' : 'Locked'; nodes.soundStatusDisplay.textContent = state.sound ? 'On' : 'Off'; nodes.playButton.disabled = state.busy || state.done || left() <= 0; nodes.playButton.textContent = state.done ? 'Reward Unlocked' : left() <= 0 ? 'No Plays Left' : 'Play'; nodes.soundToggle.textContent = state.sound ? 'Turn Sound Off' : 'Turn Sound On'; nodes.speechToggle.textContent = state.speech ? 'Turn Game Voice Off' : 'Turn Game Voice On'; history(); if (state.done) openPanel(); }
   function history() { nodes.playHistory.innerHTML = ''; if (!state.history.length) { const li = document.createElement('li'); li.textContent = 'No plays yet.'; nodes.playHistory.appendChild(li); return; } state.history.forEach(h => { const li = document.createElement('li'); li.textContent = `${h.ok ? 'Matched' : 'No match'}: ${h.labels.join(', ')}.`; nodes.playHistory.appendChild(li); }); }
   function say(text, voice=false, urgent=false) { const region = urgent ? nodes.assertiveRegion : nodes.liveRegion; region.textContent=''; setTimeout(()=>region.textContent=text,20); if (voice && state.speech && 'speechSynthesis' in window) { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.rate=.94; speechSynthesis.speak(u); } }
   function tone(kind) { if (!state.sound) return; try { const C = window.AudioContext || window.webkitAudioContext; if (!C) return; audioCtx = audioCtx || new C(); if (audioCtx.state === 'suspended') audioCtx.resume(); const now = audioCtx.currentTime, g = audioCtx.createGain(), o = audioCtx.createOscillator(); const map = { start:[180,.16,.07], tick:[520,.08,.06], high:[880,.42,.09], low:[170,.18,.05] }; const [f,d,v] = map[kind] || map.tick; o.type = kind === 'high' ? 'triangle' : 'sine'; o.frequency.setValueAtTime(f, now); g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(v, now+.02); g.gain.exponentialRampToValueAtTime(.0001, now+d); o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now+d+.02); } catch(e) {} }

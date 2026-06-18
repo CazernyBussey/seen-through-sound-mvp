@@ -1,5 +1,89 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CFLY Fan Unlock</title></head>
-<body><main><h1>CFLY Fan Unlock</h1><p>Interactive Cazerny Bussey fan unlock experience for We In Here.</p></main></body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="description" content="CFLY Fan Unlock is an accessible Cazerny Bussey fan experience for We In Here." />
+  <title>CFLY Fan Unlock: We In Here Edition</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#gameArea">Skip to game</a>
+
+  <noscript>
+    <main class="no-script-card" role="main">
+      <h1>CFLY Fan Unlock needs JavaScript</h1>
+      <p>This experience uses JavaScript for the tiles, sound, speech, and download unlock. Please enable JavaScript to play.</p>
+    </main>
+  </noscript>
+
+  <main class="app-shell" id="app" data-state="loading">
+    <header class="hero" aria-labelledby="gameTitle">
+      <p class="eyebrow" id="brandEyebrow">Cazerny Bussey presents</p>
+      <h1 id="gameTitle">CFLY Fan Unlock</h1>
+      <p class="edition" id="gameEdition">We In Here Edition</p>
+      <p class="hero-copy" id="promoMessage">Tap play, match three tiles, and unlock the We In Here fan download.</p>
+      <p class="legal-note" id="legalNote">Fan appreciation experience only. No purchase, no cash value, no official team affiliation.</p>
+    </header>
+
+    <section class="status-panel" aria-label="Game status">
+      <div class="status-card"><span class="status-label">Tries left today</span><strong id="triesLeftDisplay">7</strong></div>
+      <div class="status-card"><span class="status-label">Download</span><strong id="downloadStatusDisplay">Locked</strong></div>
+      <div class="status-card"><span class="status-label">Sound</span><strong id="soundStatusDisplay">On</strong></div>
+    </section>
+
+    <section class="game-card" id="gameArea" aria-labelledby="gameHeading">
+      <div class="machine-top" aria-hidden="true"><span class="light"></span><span class="light"></span><span class="light"></span></div>
+      <h2 id="gameHeading">Play the CFLY fan unlock</h2>
+      <p class="instructions" id="instructions">Press the Play button, or press Enter or Space while the button is focused. Match three special tiles to unlock the download.</p>
+
+      <div class="tile-machine" aria-label="Three tile match area">
+        <div class="tile" id="tile0" role="img" aria-label="Tile one: waiting"><span class="tile-emoji" aria-hidden="true">🎤</span><span class="tile-label">Mic</span></div>
+        <div class="tile" id="tile1" role="img" aria-label="Tile two: waiting"><span class="tile-emoji" aria-hidden="true">🏀</span><span class="tile-label">Ball</span></div>
+        <div class="tile" id="tile2" role="img" aria-label="Tile three: waiting"><span class="tile-emoji" aria-hidden="true">👑</span><span class="tile-label">Crown</span></div>
+      </div>
+
+      <div class="controls" aria-label="Game controls">
+        <button id="playButton" class="primary-button" type="button" aria-describedby="instructions">Play</button>
+        <button id="soundToggle" class="secondary-button" type="button" aria-pressed="false">Turn Sound Off</button>
+        <button id="speechToggle" class="secondary-button" type="button" aria-pressed="false">Turn Game Voice Off</button>
+      </div>
+
+      <p class="result-line" id="visibleResult" tabindex="-1">Ready. Press Play when you are ready.</p>
+
+      <div class="download-panel" id="downloadPanel" hidden>
+        <h3 id="downloadTitle">Download unlocked</h3>
+        <p id="downloadMessage">CFLY! You unlocked the fan download.</p>
+        <div class="download-actions">
+          <a id="downloadLink" class="primary-link" href="#" download>Download</a>
+          <a id="shareLink" class="secondary-link" href="#" target="_blank" rel="noopener">Share</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="accessibility-card" aria-labelledby="accessibilityTitle">
+      <h2 id="accessibilityTitle">Accessibility built in</h2>
+      <p>This experience supports keyboard play, screen reader announcements, reduced motion settings, and spoken game updates. Voice clips can be replaced with Cazerny’s real recordings when ready.</p>
+    </section>
+
+    <section class="monthly-card" aria-labelledby="monthlyTitle">
+      <h2 id="monthlyTitle">Monthly update system</h2>
+      <p>To update the experience each month, edit <code>config.js</code>: change the edition name, download file, special tile, voice clips, message, and theme.</p>
+    </section>
+
+    <section class="history-card" aria-labelledby="historyTitle">
+      <h2 id="historyTitle">Recent plays</h2>
+      <ol id="playHistory" aria-label="Recent play history"></ol>
+    </section>
+
+    <footer class="footer"><p id="footerText">CFLY means Cazerny Forever Loves You.</p></footer>
+  </main>
+
+  <div class="sr-only" id="liveRegion" aria-live="polite" aria-atomic="true"></div>
+  <div class="sr-only" id="assertiveRegion" aria-live="assertive" aria-atomic="true"></div>
+
+  <script src="./config.js"></script>
+  <script src="./game.js"></script>
+</body>
 </html>

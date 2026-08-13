@@ -3,7 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Playlist | Seen Through Sound</title>
+  <title>Listen | Seen Through Sound</title>
+  <meta name="description" content="Listen to approved encouragement messages from Seen Through Sound." />
   <link rel="icon" href="assets/seen-through-sound-logo.svg?v=seen-through-sound-logo-20260521" type="image/svg+xml" />
   <link rel="stylesheet" href="styles.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,21 +15,34 @@
   <header class="site-header">
     <div class="brand-lockup">
       <img class="brand-logo" src="assets/seen-through-sound-logo.svg?v=seen-through-sound-logo-20260521" alt="Seen Through Sound" />
-      <div>
-        <p class="eyebrow">Seen Through Sound</p>
-        <h1>Playlist</h1>
-      </div>
+      <div><p class="eyebrow">Seen Through Sound</p><h1>Listen</h1></div>
     </div>
-    <nav aria-label="Main navigation">
-      <a href="index.html">Record Your Encouragement</a>
-    </nav>
+    <nav aria-label="Main navigation"><a href="index.html">Record Your Encouragement</a></nav>
   </header>
-
   <main id="main" class="container">
-    <section class="card" aria-labelledby="playlist-heading">
-      <h2 id="playlist-heading">Encouragement Playlist</h2>
-      <div id="playlistStatus" aria-live="polite"></div>
-      <div id="playlist"></div>
+    <section class="card" aria-labelledby="listen-heading">
+      <h2 id="listen-heading">Listen to Encouragement</h2>
+      <p>Use the simple controls below to move through the messages.</p>
+      <div id="playerStatus" class="status-panel" role="status" aria-live="polite" aria-atomic="true">Loading messages…</div>
+      <section class="player-card" aria-labelledby="now-playing-heading">
+        <h3 id="now-playing-heading">Now playing</h3>
+        <p id="currentTitle">No message selected</p>
+        <p id="currentSpeaker" class="tagline"></p>
+        <audio id="audioPlayer" preload="metadata"></audio>
+        <div class="player-controls" role="group" aria-label="Audio player controls">
+          <button id="previousButton" type="button" aria-label="Play previous message">Back</button>
+          <button id="playButton" type="button" aria-label="Play selected message">Play</button>
+          <button id="nextButton" type="button" aria-label="Play next message">Forward</button>
+        </div>
+        <p id="playbackStatus" class="form-help" aria-live="polite">Choose a message below.</p>
+      </section>
+    </section>
+    <section class="card" aria-labelledby="library-heading">
+      <h2 id="library-heading">Search the audio library</h2>
+      <label for="audioSearch">Search by title or speaker</label>
+      <input id="audioSearch" type="search" placeholder="Type a name or title" autocomplete="off" />
+      <p id="resultCount" class="form-help" aria-live="polite"></p>
+      <div id="audioLibrary" class="audio-library"></div>
     </section>
   </main>
 </body>

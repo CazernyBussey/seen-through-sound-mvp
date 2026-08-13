@@ -68,7 +68,11 @@ function renderLibrary() {
     button.type = "button";
     button.className = "library-item";
     button.setAttribute("aria-pressed", String(index === currentIndex));
-    button.innerHTML = `<strong>${item.title || "Encouragement Message"}</strong><span>Shared by ${publicName(item)}</span>`;
+    const title = document.createElement("strong");
+    title.textContent = item.title || "Encouragement Message";
+    const speaker = document.createElement("span");
+    speaker.textContent = `Shared by ${publicName(item)}`;
+    button.append(title, speaker);
     button.addEventListener("click", () => {
       selectMessage(index);
       document.getElementById("now-playing-heading").focus?.();

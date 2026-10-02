@@ -9,6 +9,41 @@ function safeURL(value,media=false){try{const u=new URL(value);return u.protocol
 // Restore media routing after microphone use; browsers without this API keep their default.
 function playbackMode(){try{if(typeof navigator!=='undefined'&&navigator.audioSession)navigator.audioSession.type='playback';}catch{}}
 playbackMode();
+// Unlock the short listening cue during the user's Speak gesture.
+let listeningCueContext=null;
+function prepareListeningCue(){
+ try{
+  const Context=window.AudioContext||window.webkitAudioContext;
+  if(!Context)return;
+  listeningCueContext??=new Context();
+  void listeningCueContext.resume().catch(()=>{});
+ }catch{}
+}
+async function microphoneCue(frequency,requireListening=false){
+ try{
+  const context=listeningCueContext;
+  if(!context)return;
+  await context.resume();
+  if(requireListening&&!voiceInput?.isListening())return;
+  await new Promise(resolve=>{
+   const oscillator=context.createOscillator(),gain=context.createGain(),now=context.currentTime;
+   let finished=false,timer;
+   function finish(){
+    if(finished)return;finished=true;clearTimeout(timer);
+    try{oscillator.stop();oscillator.disconnect();gain.disconnect();}catch{}
+    void context.suspend().catch(()=>{});resolve();
+   }
+   oscillator.frequency.value=frequency;
+   gain.gain.setValueAtTime(0,now);
+   gain.gain.linearRampToValueAtTime(0.12,now+0.01);
+   gain.gain.linearRampToValueAtTime(0,now+0.12);
+   oscillator.connect(gain);gain.connect(context.destination);
+   oscillator.onended=finish;
+   oscillator.start(now);oscillator.stop(now+0.13);
+   timer=setTimeout(finish,350);
+  });
+ }catch{}
+}
 function status(text){$('status').textContent=text}
 let spokenUtterance=null, speechTimer=null;
 function silence(){$('greeting-audio').pause();clearTimeout(speechTimer);spokenUtterance=null;if('speechSynthesis'in window)window.speechSynthesis.cancel()}
@@ -40,7 +75,7 @@ try{const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type
 $('cancel-request').addEventListener('click',()=>controller?.abort());$('play').addEventListener('click',()=>{if(selected?.provider==='spotify'&&!selected?.media&&!spotifyActive){spotify(selected);return}if(selected&&!$('audio').getAttribute('src'))$('audio').src=selected.media;play()});$('pause').addEventListener('click',pause);$('stop').addEventListener('click',stop);$('silence').addEventListener('click',()=>{silence();$('voice-status').textContent='Spoken message stopped.'});$('read-aloud').addEventListener('change',()=>{if(!$('read-aloud').checked)silence();else read($('answer').textContent||$('greeting').textContent,true)});$('clear').addEventListener('click',()=>{controller?.abort();stop();session={};selected=null;$('results').replaceChildren();$('answer').textContent='';$('response').hidden=true;$('read-answer').hidden=true;$('player').hidden=true;status('Conversation cleared.');requestInput.focus()});
 $('audio').addEventListener('playing',()=>{$('media-status').textContent='Playing: '+$('track').textContent});$('audio').addEventListener('pause',()=>{if(selected&&!$('audio').ended&&$('audio').getAttribute('src'))$('media-status').textContent='Paused: '+$('track').textContent});$('audio').addEventListener('ended',()=>{$('media-status').textContent='Finished: '+$('track').textContent});$('audio').addEventListener('error',()=>{if(selected&&$('audio').getAttribute('src')){$('media-status').textContent='Audio could not be loaded. Try Play or open the official media page.'}});
 const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
-voiceInput=createVoiceInput({Speech,button:$('speak'),feedback:text=>{$('voice-status').textContent=text},onRequest:message=>{requestInput.value=message;send(message)},onBeforeListen:()=>{unlockAudio();silence();if(selected&&(!$('audio').paused||spotifyActive))pause()},onUnavailable:()=>{requestInput.focus()}});
+voiceInput=createVoiceInput({Speech,button:$('speak'),feedback:text=>{$('voice-status').textContent=text},onRequest:message=>{requestInput.value=message;send(message)},onListening:()=>{void microphoneCue(880,true)},onAfterListen:()=>microphoneCue(440),onBeforeListen:()=>{unlockAudio();silence();if(selected&&(!$('audio').paused||spotifyActive))pause();prepareListeningCue()},onUnavailable:()=>{requestInput.focus()}});
 $('greet').addEventListener('click',()=>{voiceInput?.abort();silence();if(selected&&(!$('audio').paused||spotifyActive))pause();playbackMode();const audio=$('greeting-audio');audio.hidden=false;audio.currentTime=0;audio.play().catch(()=>{$('voice-status').textContent='Greeting playback could not start. Use Play in the greeting audio controls, or check your device volume.';audio.focus()})});
 $('greeting-audio').addEventListener('playing',()=>{$('voice-status').textContent='Playing greeting. Use Stop spoken response to stop.'});
 $('greeting-audio').addEventListener('ended',()=>{$('voice-status').textContent='Greeting finished. Select Speak now to tell ETIB what to open or play.'});

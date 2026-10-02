@@ -8,11 +8,11 @@ function setup(supported=true){
  let handler, recognition;
  class Speech {constructor(){recognition=this;}start(){this.starts=(this.starts||0)+1;}abort(){this.aborts=(this.aborts||0)+1;}}
  const button={textContent:'',disabled:false,attributes:{},setAttribute(k,v){this.attributes[k]=v;},addEventListener(type,fn){handler=fn;}};
- const requests=[],feedback=[];
- const controller=context.createVoiceInput({Speech:supported?Speech:null,button,feedback:text=>feedback.push(text),onRequest:text=>requests.push(text),onBeforeListen:()=>{},onUnavailable:()=>{}});
- return {button,controller,requests,feedback,click:()=>handler(),get recognition(){return recognition;}};
+ const requests=[],feedback=[],cues=[];
+ const controller=context.createVoiceInput({Speech:supported?Speech:null,button,feedback:text=>feedback.push(text),onRequest:text=>{if(supported)assert.equal(cues.at(-1),'ended');requests.push(text)},onBeforeListen:()=>{},onUnavailable:()=>{},onListening:()=>cues.push('ready'),onAfterListen:()=>{cues.push('ended')}});
+ return {button,controller,requests,feedback,cues,click:()=>handler(),get recognition(){return recognition;}};
 }
-let v=setup();v.click();assert.equal(modes.at(-1),'play-and-record');v.recognition.onstart();
+let v=setup();v.click();assert.equal(modes.at(-1),'play-and-record');assert.equal(v.cues.length,0,'No ready cue before capture starts');v.recognition.onstart();assert.equal(v.cues.length,1);assert.equal(v.controller.isListening(),true);
 v.recognition.onresult({resultIndex:0,results:[Object.assign([{transcript:'Play ETIB Radio'}],{isFinal:true})]});
 assert.deepEqual(v.requests,[],'Do not run actions while microphone is still capturing');
 v.recognition.onend();assert.equal(modes.at(-1),'playback');assert.deepEqual(v.requests,['Play ETIB Radio']);assert.equal(v.button.attributes['aria-pressed'],'false');
@@ -26,4 +26,3 @@ v=setup();v.recognition.start=()=>{throw Error('unavailable')};v.click();assert.
 console.log('Voice input tests passed: capture completion, command dispatch, cancellation, pending requests, denied/unavailable microphone, no speech, unsupported browser.');
 
 const unavailableButton={setAttribute(){},addEventListener(type,fn){this.click=fn}};const messages=[];context.createVoiceInput({Speech:class{constructor(){throw new Error('unavailable')}},button:unavailableButton,feedback:t=>messages.push(t),onUnavailable(){},onBeforeListen(){},onRequest(){throw Error('must not submit')}});unavailableButton.click();assert.match(messages[0],/does not support/);
-

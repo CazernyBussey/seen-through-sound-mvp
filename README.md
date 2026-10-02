@@ -54,3 +54,9 @@ Current authoritative WordPress links identify Radio Podcast YouTube playlist PL
 Python 3.13: `python server.py`, binding `0.0.0.0` and the `PORT` environment variable. There are no pip packages to install. Render build: `python -m py_compile server.py`; start: `python server.py`; free instance.
 
 Test: `python tests/test_backend.py` from the repository root. Tests use dated public-source fixtures and do not alter connected systems. Refresh a source or registry entry after a provider or URL changes. Never add private connector credentials to client code or publish private ETIB operational data.
+
+## Voice correction, October 2, 2026
+
+Microphone requests now expose starting/listening/heard/error states and run after recognition ends. Speak is disabled while a request is pending. Cancel discards a partial command. Browser permission, microphone, speech-service/network, no-speech, and unsupported-browser failures have distinct guidance. Keyboard dictation requires Send. A Hear greeting button and Read last answer button start speech directly from a user activation; spoken replies remain optional and off by default. Synthesis keeps the utterance alive, selects an available English voice, resumes the engine, and reports failures or no-start. Greeting does not autoplay or compete with VoiceOver on page load. Existing ElevenLabs assistant remains an optional link; its configuration is unchanged.
+
+Run `node tests/test_voice.cjs` for microphone lifecycle/dispatch/cancellation/error regression checks and `python tests/test_backend.py` for routing/source checks. These simulated input checks do not verify physical microphone transcription, actual speaker output, or iPhone VoiceOver.

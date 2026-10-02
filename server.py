@@ -148,6 +148,7 @@ def reply(message,session=None):
     q=norm(message);session=session or {};out={'text':'','results':[],'action':None,'session':{k:v for k,v in session.items() if k in ['podcast','last_id','playing_id']}}
     def answer(text,items=[],action=None):
         out.update(text=text,results=cards(items),action=action);return out
+    if re.fullmatch(r'(hello|hi|hey|greeting|good morning|good afternoon|good evening)( etib)?',q):return answer('Welcome to Talk to ETIB. Say Play ETIB Radio, Play the latest Experience episode, Show upcoming events, or Take me to ETIB Facebook. Select Speak a request for each new voice command.')
     if not q:return answer('Type a question or choose What can I ask.')
     if re.fullmatch(r'(please )?(pause|pause (?:it|audio|the radio|the podcast|the episode|the music))',q):return answer('Pause requested.',action={'type':'pause'})
     if re.fullmatch(r'(please )?(resume|resume (?:it|audio|the radio|the podcast|the episode)|continue|continue playing|unpause)',q):return answer('Resume requested.',action={'type':'resume'})
@@ -215,7 +216,7 @@ class Handler(BaseHTTPRequestHandler):
         path=urlparse(self.path).path
         if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','paid_services':False}).encode())
         if path=='/api/registry':return self.send(200,json.dumps(REGISTRY).encode())
-        mapping={'/':'index.html','/index.html':'index.html','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
+        mapping={'/':'index.html','/index.html':'index.html','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
         f=mapping.get(path)
         if not f:return self.send(404,b'{"error":"Not found"}')
         kind='text/html; charset=utf-8' if f.endswith('html') else 'text/javascript; charset=utf-8' if f.endswith('js') else 'text/css; charset=utf-8'

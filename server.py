@@ -176,7 +176,7 @@ def reply(message,session=None):
         if not kind:
             return answer('Which podcast: ETIB Radio Podcast or ETIB Experience?',[dict(r,title=r['name']) for r in REGISTRY if r['id'] in ['experience','radio_podcast']])
         out['session']['podcast']=kind;s=source(kind)
-        latest=any(w in q for w in ['latest','newest','recent','current']) or re.fullmatch(r'(play )?(radio podcast|etib radio podcast|experience|etib experience)',q)
+        latest=any(w in q for w in ['latest','newest','recent','current']) or re.fullmatch(r'(play )?(radio podcast|etib radio podcast|experience|etib experience)',q) or not re.sub(r'\b(please|play|listen|to|the|a|start|playing|etib|even|though|i|m|im|blind|radio|experience|podcast|episode)\b',' ',q).strip()
         found=s['items'][:1] if latest else rank(s['items'],message)
         if not found:return answer('I could not retrieve a matching episode. Try a guest name or open the official podcast page. '+freshness(s),[dict(r,title=r['name']) for r in REGISTRY if r['id']==kind])
         item=found[0];out['session']['last_id']=item['id']

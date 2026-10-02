@@ -6,7 +6,7 @@ function setup(options={}){
  vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../voice.js'),'utf8'),context);
  class Speech{constructor(){if(options.constructorError)throw Error('unavailable');recognizers.push(this)}start(){this.starts=(this.starts||0)+1;if(options.startErrorOnce&&this.starts===1){const e=new Error('Busy');e.name='InvalidStateError';throw e}if(options.startError)throw Error('start failed')}stop(){this.stops=(this.stops||0)+1;if(options.syncEnd)this.onend?.()}abort(){this.aborts=(this.aborts||0)+1;this.onend?.()}}
  const button={setAttribute(k,v){this[k]=v},addEventListener(type,fn){handler=fn}};
- const controller=context.createVoiceInput({Speech:options.unsupported?null:Speech,button,feedback:t=>feedback.push(t),onRequest:t=>requests.push(t),onBeforeListen(){},onUnavailable(){}});
+ const controller=context.createVoiceInput({Speech:options.unsupported?null:Speech,button,feedback:t=>feedback.push(t),onRequest:t=>requests.push(t),onBeforeListen(){return options.mediaDelay||0},onUnavailable(){}});
  return {button,controller,requests,feedback,recognizers,timers,click:()=>handler(),tick(ms){for(const [id,t] of [...timers])if(t.ms===ms){timers.delete(id);t.fn()}},get r(){return recognizers.at(-1)}};
 }
 const result=(text,final=false)=>({results:[Object.assign([{transcript:text}],{isFinal:final})]});
@@ -35,4 +35,6 @@ v=setup();v.click();v.r.onaudiostart();v.tick(8000);v.tick(1500);assert.equal(v.
 // Every kind of command must trigger once and leave the next activation ready.
 v=setup();for(const command of ['Play ETIB Radio','Play Radio Podcast','Play Experience','Seen Through Sound','Take me to ETIB Facebook','Pause']){v.click();v.r.onstart();v.r.onresult(result(command,true));v.r.onend();assert.equal(v.button.textContent,'Speak now');}assert.equal(v.requests.length,6);
 v=setup({startErrorOnce:true});v.click();v.tick(150);assert.equal(v.r.starts,2);v.r.onstart();v.r.onresult(result('Play radio',true));v.r.onend();assert.deepEqual(v.requests,['Play radio'],'Recover a still-releasing speech service without requiring another tap');
+v=setup({mediaDelay:400});v.click();assert.equal(v.r.starts,undefined);v.tick(400);assert.equal(v.r.starts,1);v.r.onstart();v.r.onresult(result('Play radio',true));v.r.onend();assert.deepEqual(v.requests,['Play radio']);
+v=setup({mediaDelay:400});v.click();v.controller.abort();v.tick(400);assert.equal(v.r.starts,undefined,'Canceled media handoff must not start microphone later');
 console.log('PASS: final/interim triggers, identical interim events, manual Done speaking, late final results, 8-second cap, startup timeout, missing/synchronous end, stale events, cancellation and microphone failures.');

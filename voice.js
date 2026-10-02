@@ -66,11 +66,12 @@ function createVoiceInput({Speech,button,feedback,onRequest,onBeforeListen,onUna
   button.textContent='Done speaking';button.setAttribute('aria-pressed','true');feedback('Starting microphone…');
   later(attempt,'startup',()=>{finish(attempt,false);feedback('Microphone did not start. Choose a suggestion or open Help and options.');},10000);
   function startFailed(){finish(attempt,false);feedback('Microphone could not start. Choose a suggestion or open Help and options.');}
-  try{onBeforeListen?.();recognition.start();}catch(error){
+  function begin(){if(current!==attempt||attempt.stopping)return;try{recognition.start();}catch(error){
    // Give a just-aborted Safari capture one short chance to release its service.
    if(error.name==='InvalidStateError')later(attempt,'start-retry',()=>{try{recognition.start();}catch{startFailed();}},150);
    else startFailed();
-  }
+  }}
+  try{const delay=onBeforeListen?.();if(Number.isFinite(delay)&&delay>0)later(attempt,'media-settle',begin,Math.min(delay,1000));else begin();}catch{startFailed();}
  }
  button.addEventListener('click',start);reset();
  return {abort,setBusy,isListening:()=>!!current&&!current.stopping};

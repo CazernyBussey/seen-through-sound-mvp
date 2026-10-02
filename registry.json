@@ -40,6 +40,8 @@
     "id": "radio",
     "name": "ETIB Radio",
     "aliases": [
+      "et radio",
+      "e t i b radio",
       "even though im blind radio",
       "even though i'm blind radio",
       "radio station",
@@ -99,6 +101,12 @@
     "id": "seen",
     "name": "Seen Through Sound",
     "aliases": [
+      "even though im blind seen through sound",
+      "even though i'm blind seen through sound",
+      "seeing through sound",
+      "scene to sound",
+      "scene through sound",
+      "seen to sound",
       "encouragement playlist",
       "seen through sound",
       "encouragement"

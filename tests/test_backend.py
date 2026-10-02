@@ -12,6 +12,15 @@ r=check('Play ETIB Radio');assert r['action']['item']['media']=='https://stream.
 for q in ["Play Even Though I'm Blind Radio","Play Even Though I’m Blind Radio","Listen to Even Though I'm Blind Experience Podcast","Play Even Though I'm Blind Experience","Play the newest Even Though I'm Blind Radio Podcast"]:
  result=check(q);assert result['action']['type'] in ['play','spotify']
  if 'Experience' in q:assert result['action']['item']['id']==server.CACHE['experience']['items'][0]['id']
+for request in ['Seen Through Sound','Play Seen Through Sound','Scene to sound','Play scene through sound']:
+ result=check(request);assert result['action']['type']=='play';assert result['action']['item']['id']==server.CACHE['seen']['items'][0]['id']
+assert check('Show Seen Through Sound')['action'] is None
+assert check('Take me to Seen Through Sound')['action']['type']=='navigate'
+assert check('Play it',{'playing_id':'radio'})['action']['item']['id']=='radio'
+assert check('Play E T I B Radio')['action']['item']['id']=='radio'
+seen=server.CACHE['seen']['items'];server.CACHE['seen']['items']=[dict(seen[0],media=''),*seen]
+assert check('Seen Through Sound')['action']['item']['id']==seen[0]['id']
+server.CACHE['seen']['items']=seen
 for q,a in [('Pause' ,'pause'),('Resume','resume'),('Stop','stop')]:assert check(q)['action']['type']==a
 r=check('Play the latest ETIB Experience episode');assert r['action']['type']=='play' and not r['results'][0]['preview']
 r=check('Play the latest ETIB Radio Podcast episode');assert r['action']['type']=='spotify' and r['action']['item']['preview']

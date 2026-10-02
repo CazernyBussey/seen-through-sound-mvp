@@ -74,7 +74,7 @@ def load_seen():
     rows=json.loads(fetch('https://wrczpnhesorptjzwdizd.supabase.co/rest/v1/submissions?select=id,title,speaker_name,anonymous,original_audio_url,processed_audio_url,published_at&status=eq.published&order=published_at.desc&limit=100',{'apikey':'sb_publishable_cm8re92ds8XLhspfdNSwuw_X74b7kDm'}))
     items=[]
     for x in rows:
-        media=x.get('processed_audio_url') or x.get('original_audio_url') or ''
+        media=next((u for u in [x.get('processed_audio_url'),x.get('original_audio_url')] if u and safe_url(u,True)),'')
         items.append(dict(id='seen-'+str(x['id']),title=x.get('title') or 'Encouragement message',description='Shared by '+('Anonymous' if x.get('anonymous') else x.get('speaker_name') or 'Anonymous'),text='',url='https://cazernybussey.github.io/seen-through-sound-mvp/playlist.html',media=media if safe_url(media,True) else '',date=x.get('published_at') or '',category='seen',preview=False))
     return items
 LOADERS={'wp':load_wp,'experience':load_experience,'radio_podcast':lambda:parse_spotify(fetch(SPOTIFY)),'seen':load_seen}
@@ -159,6 +159,8 @@ def reply(message,session=None):
     navigation=bool(re.search(r'\b(take me|go to|open|navigate|bring me)\b',q))
     play=bool(re.search(r'\b(play|listen|start playing)\b',q))
     dest=resolve(message)
+    if play and re.fullmatch(r'(please )?(play|listen to|start) (it|that)( please)?',q):
+        if out['session'].get('playing_id')=='radio' or out['session'].get('last_id')=='radio':dest=next(r for r in REGISTRY if r['id']=='radio')
     if navigation and re.search(r'\b(their|its|that|this) (page|website|link)\b',q):
         ident=out['session'].get('last_id')
         pool=list(REGISTRY)
@@ -185,8 +187,8 @@ def reply(message,session=None):
         if item.get('preview'):txt+=' The official Spotify player will open here. Spotify may limit embedded playback to a preview. Use the episode link for the full conversation.'
         return answer(txt,found,{'type':'spotify' if item.get('preview') else 'play','item':cards([item])[0]} if play and item.get('media') else None)
     if dest and dest['id']=='seen':
-        if play:
-            s=source('seen');found=s['items'][:1]
+        if play or not re.search(r'\b(show|find|search|what|about|describe|tell)\b',q):
+            s=source('seen');found=[x for x in s['items'] if x.get('media') and safe_url(x['media'],True)][:1]
             if found and found[0].get('media'):
                 out['session'].update(last_id=found[0]['id'],playing_id=found[0]['id']);return answer('Encouragement selected. '+freshness(s),found,{'type':'play','item':cards(found)[0]})
             return answer('Open the official Seen Through Sound playlist to listen. '+freshness(s),[dict(dest,title=dest['name'])])

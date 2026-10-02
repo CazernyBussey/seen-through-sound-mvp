@@ -5,12 +5,14 @@ from pathlib import Path
 from urllib.request import Request, urlopen
 from urllib.parse import urlparse, parse_qs
 import xml.etree.ElementTree as ET
+import directory
 
 ROOT=Path(__file__).parent
 CHAT_SLOTS=threading.BoundedSemaphore(8)
 REQUEST_TIMES=[]
 REGISTRY=json.loads((ROOT/'registry.json').read_text())
 SNAPSHOT=json.loads((ROOT/'snapshot.json').read_text())
+SNAPSHOT['directory']=json.loads((ROOT/'directory-snapshot.json').read_text())
 CACHE={}; FETCHING=set(); LOCK=threading.Lock(); POOL=concurrent.futures.ThreadPoolExecutor(max_workers=6)
 WP='https://public-api.wordpress.com/rest/v1.1/sites/244196168/posts/'
 FEED='https://anchor.fm/s/1046548ac/podcast/rss'
@@ -112,7 +114,7 @@ def load_seen():
         media=next((u for u in [x.get('processed_audio_url'),x.get('original_audio_url')] if u and safe_url(u,True)),'')
         items.append(dict(id='seen-'+str(x['id']),title=x.get('title') or 'Encouragement message',description='Shared by '+('Anonymous' if x.get('anonymous') else x.get('speaker_name') or 'Anonymous'),text='',url='https://cazernybussey.github.io/seen-through-sound-mvp/playlist.html',media=media if safe_url(media,True) else '',date=x.get('published_at') or '',category='seen',preview=False))
     return items
-LOADERS={'wp':load_wp,'experience':load_experience,'radio_podcast':load_radio_podcast,'seen':load_seen}
+LOADERS={'directory':lambda:directory.load(fetch,clean),'wp':load_wp,'experience':load_experience,'radio_podcast':load_radio_podcast,'seen':load_seen}
 
 def source(key):
     with LOCK:
@@ -200,8 +202,17 @@ def reply(message,session=None):
         ident=out['session'].get('last_id')
         pool=list(REGISTRY)
         if ident and ident not in [r['id'] for r in pool]:
-            for key in ['wp','experience','radio_podcast','seen']:pool+=source(key)['items']
+            for key in ['wp','experience','radio_podcast','seen','directory']:
+                if isinstance(ident,str) and ident.startswith(key+'-'):pool+=source(key)['items']
         dest=next((x for x in pool if x['id']==ident),None)
+    # Directory names take precedence over generic words such as radio or podcast.
+    directory_source=(CACHE.get('directory') or dict(SNAPSHOT['directory'],live=False,timestamp=0))
+    community=directory.request(message,directory_source['items'],norm,explicit_etib=bool(dest and dest['id']!='directory'))
+    if time.time()-directory_source.get('timestamp',0)>=300 and 'directory' not in FETCHING:POOL.submit(source,'directory')
+    if community:
+        results=community['items']
+        if results:out['session']['last_id']=results[0]['id']
+        return answer(community['text']+' '+freshness(directory_source),results,community['action'])
     if play and 'spotify' in q and dest and dest['id'] in ['experience','radio_podcast','radio']:
         kind='radio_podcast' if dest['id']=='radio' else dest['id'];podcast=next(r for r in REGISTRY if r['id']==kind)
         return answer('Opening '+podcast['name']+' on Spotify.',action={'type':'navigate','url':SPOTIFY if kind=='radio_podcast' else 'https://open.spotify.com/show/2ejjSEAbngiJDrvqiN6vR6'})
@@ -256,7 +267,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         path=urlparse(self.path).path
         if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','speech_provider':'ElevenLabs','speech_uses_connected_account':True}).encode())
-        if path=='/api/registry':return self.send(200,json.dumps(REGISTRY).encode())
+        if path=='/api/registry':return self.send(200,json.dumps(REGISTRY+cards((CACHE.get('directory') or SNAPSHOT['directory'])['items'])).encode())
         if path=='/api/audio':
             latest={}
             for key in ['experience','radio_podcast']:

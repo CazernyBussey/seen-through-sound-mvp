@@ -15,6 +15,7 @@ CACHE={}; FETCHING=set(); LOCK=threading.Lock(); POOL=concurrent.futures.ThreadP
 WP='https://public-api.wordpress.com/rest/v1.1/sites/244196168/posts/'
 FEED='https://anchor.fm/s/1046548ac/podcast/rss'
 SPOTIFY='https://open.spotify.com/show/6302Iby2KZMf4MWYq2sr16'
+EXPERIENCE_SPOTIFY='https://open.spotify.com/show/2ejjSEAbngiJDrvqiN6vR6'
 
 def clean(s):
     return html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]*>',' ',re.sub(r'<(?:script|style)\b[^>]*>.*?</(?:script|style)>','',s or '',flags=re.S)))).strip()
@@ -48,7 +49,7 @@ def load_wp():
         if page*100>=raw.get('found',0) or not raw.get('posts'):break
     return items
 
-def load_experience():
+def load_experience_feed():
     root=ET.fromstring(fetch(FEED));items=[]
     for x in root.findall('./channel/item'):
         enc=x.find('enclosure');media=enc.get('url','') if enc is not None else ''
@@ -56,19 +57,40 @@ def load_experience():
         except Exception:date=''
         url=x.findtext('link','')
         if not safe_url(url):url=next(r['url'] for r in REGISTRY if r['id']=='experience')
-        items.append(dict(id='experience-'+str(len(items)),title=clean(x.findtext('title')),description=clean(x.findtext('description')),text=clean(x.findtext('description')),date=date,url=url,media=media if safe_url(media,True) else '',category='experience',preview=False))
+        # The RSS enclosure wraps its public MP3 in an analytics redirect.
+        direct=re.search(r'https%3A%2F%2Fd3ctxlq1ktw2nl\.cloudfront\.net%2F[^?]+',media,re.I)
+        if direct:
+            from urllib.parse import unquote
+            decoded=unquote(direct[0])
+            if safe_url(decoded,True):media=decoded
+        items.append(dict(id='experience-'+str(len(items)),title=clean(x.findtext('title')),description=clean(x.findtext('description')),text=clean(x.findtext('description')),date=date,url=url,spotify_url=EXPERIENCE_SPOTIFY,media=media if safe_url(media,True) else '',category='experience',preview=False))
     if not items:raise ValueError('No episodes')
     return sorted(items,key=lambda x:x['date'],reverse=True)
 
-def parse_spotify(s):
+def parse_spotify(s,show_id='6302Iby2KZMf4MWYq2sr16',category='radio_podcast'):
     m=re.search(r'<script id="initialState"[^>]*>(.*?)</script>',s,re.S)
     if not m:raise ValueError('Spotify source changed')
-    state=json.loads(base64.b64decode(m.group(1)));show=state['entities']['items']['spotify:show:6302Iby2KZMf4MWYq2sr16'];items=[]
+    state=json.loads(base64.b64decode(m.group(1)));show=state['entities']['items']['spotify:show:'+show_id];items=[]
     for item in show['pages']['items']:
         x=item['entity']['data'];media=x.get('previewPlayback',{}).get('audioPreview',{}).get('cdnUrl','')
-        items.append(dict(id='radio-'+x['id'],title=clean(x['name']),description=clean(x.get('description','')),text=clean(x.get('description','')),date=x.get('releaseDate',{}).get('isoString',''),url='https://open.spotify.com/episode/'+x['id'],media=media if safe_url(media,True) else '',category='radio_podcast',preview=True))
+        items.append(dict(id=category+'-'+x['id'],title=clean(x['name']),description=clean(x.get('description','')),text=clean(x.get('description','')),date=x.get('releaseDate',{}).get('isoString',''),url='https://open.spotify.com/episode/'+x['id'],spotify_url='https://open.spotify.com/episode/'+x['id'],media=media if safe_url(media,True) else '',category=category,preview=True))
     if not items:raise ValueError('No episodes')
     return sorted(items,key=lambda x:x['date'],reverse=True)
+
+def load_experience():
+    try:items=load_experience_feed()
+    except Exception:items=[]
+    try:previews=parse_spotify(fetch(EXPERIENCE_SPOTIFY),'2ejjSEAbngiJDrvqiN6vR6','experience')
+    except Exception:previews=[]
+    if not items:
+        if previews:return previews
+        raise ValueError('Experience sources unavailable')
+    for item in items:
+        preview=next((x for x in previews if norm(x['title'])==norm(item['title'])),None)
+        if preview:
+            item['spotify_url']=preview['url']
+            if preview['media']:item['preview_media']=preview['media']
+    return items
 
 def load_seen():
     rows=json.loads(fetch('https://wrczpnhesorptjzwdizd.supabase.co/rest/v1/submissions?select=id,title,speaker_name,anonymous,original_audio_url,processed_audio_url,published_at&status=eq.published&order=published_at.desc&limit=100',{'apikey':'sb_publishable_cm8re92ds8XLhspfdNSwuw_X74b7kDm'}))
@@ -221,6 +243,13 @@ class Handler(BaseHTTPRequestHandler):
         path=urlparse(self.path).path
         if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','paid_services':False}).encode())
         if path=='/api/registry':return self.send(200,json.dumps(REGISTRY).encode())
+        if path=='/api/audio':
+            latest={}
+            for key in ['experience','radio_podcast']:
+                items=source(key)['items']
+                if items:
+                    item=dict(items[0]);item.setdefault('spotify_url',EXPERIENCE_SPOTIFY if key=='experience' else item['url']);latest[key]=cards([item])[0]
+            return self.send(200,json.dumps(latest).encode())
         mapping={'/':'index.html','/index.html':'index.html','/listening-cue.wav':'listening-cue.wav','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
         f=mapping.get(path)
         if not f:return self.send(404,b'{"error":"Not found"}')

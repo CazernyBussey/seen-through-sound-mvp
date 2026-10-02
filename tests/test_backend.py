@@ -41,3 +41,16 @@ assert not server.safe_url('javascript:alert(1)') and not server.safe_url('https
 r=check('Take me to https://evil.com/');assert not r['action']
 server.CACHE['wp']['live']=False;r=check('What events are coming up?');assert 'cannot confirm' in r['text']
 print('PASS: routing, official URLs, media, archives, current sources, date filtering, and unsafe URLs')
+
+original_feed,original_fetch=server.load_experience_feed,server.fetch
+original_parse=server.parse_spotify
+preview=dict(server.CACHE['experience']['items'][0],media='https://p.scdn.co/preview.mp3',preview=True,url='https://open.spotify.com/episode/test')
+server.fetch=lambda url:''
+server.parse_spotify=lambda *args:[preview]
+server.load_experience_feed=lambda: (_ for _ in ()).throw(ValueError('RSS unavailable'))
+assert server.load_experience()[0]['preview']
+server.load_experience_feed=lambda:[dict(preview,media='https://d3ctxlq1ktw2nl.cloudfront.net/full.mp3',preview=False)]
+matched=server.load_experience()[0]
+assert matched['preview_media']==preview['media'] and matched['spotify_url']==preview['url']
+server.load_experience_feed,server.fetch,server.parse_spotify=original_feed,original_fetch,original_parse
+print('PASS: Experience RSS failure uses Spotify preview; full episode retains matching preview fallback.')

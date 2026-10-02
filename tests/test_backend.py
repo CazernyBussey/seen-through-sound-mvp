@@ -12,6 +12,10 @@ r=check('Play ETIB Radio');assert r['action']['item']['media']=='https://stream.
 for q in ["Play Even Though I'm Blind Radio","Play Even Though I’m Blind Radio","Listen to Even Though I'm Blind Experience Podcast","Play Even Though I'm Blind Experience","Play the newest Even Though I'm Blind Radio Podcast"]:
  result=check(q);assert result['action']['type'] in ['play','spotify']
  if 'Experience' in q:assert result['action']['item']['id']==server.CACHE['experience']['items'][0]['id']
+for q,kind in [('Play Even Though I’m Blind Radio Pod Cast','radio_podcast'),('Play Even Though I’m Blind Experience Pod Cast','experience')]:
+ result=check(q);assert result['action']['item']['id']==server.CACHE[kind]['items'][0]['id']
+for q,show in [('Play Even Though I’m Blind Radio Podcast on Spotify','6302Iby2KZMf4MWYq2sr16'),('Play Even Though I’m Blind Experience Podcast on Spotify','2ejjSEAbngiJDrvqiN6vR6')]:
+ assert check(q)['action']['url']=='https://open.spotify.com/show/'+show
 for request in ['Seen Through Sound','Play Seen Through Sound','Scene to sound','Play scene through sound']:
  result=check(request);assert result['action']['type']=='play';assert result['action']['item']['id']==server.CACHE['seen']['items'][0]['id']
 assert check('Show Seen Through Sound')['action'] is None

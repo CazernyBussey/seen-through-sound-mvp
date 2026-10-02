@@ -14,3 +14,5 @@ body{padding-bottom:calc(14rem + env(safe-area-inset-bottom,0px))}
 #player,#response{scroll-margin-bottom:15rem}
 main{min-height:45svh}
 @media(max-height:450px){body{padding-bottom:calc(9rem + env(safe-area-inset-bottom,0px))}.voice-dock #speak{min-height:48px;font-size:1.125rem}.voice-dock #voice-status{font-size:.875rem}}
+
+.spotify-links{display:flex;flex-direction:column;gap:.4rem}.spotify-links a,#track-link,#selected-spotify-link{display:block;min-height:48px;padding:.65rem 0}

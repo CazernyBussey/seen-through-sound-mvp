@@ -24,6 +24,8 @@ function createVoiceInput({Speech,button,feedback,onRequest,onBeforeListen,onUna
  }
  function abort(){if(current)finish(current,false);else reset();}
  function setBusy(value){busy=value;button.disabled=value;if(!current)reset();}
+ // Leave room for the final word in a long project name, especially Radio Podcast.
+ function silenceDelay(text){return /\b(even|though|blind|experience|radio)\b/i.test(text)&&! /\bpod\s*cast\b/i.test(text)?1400:650;}
  function start(){
   if(busy)return;
   if(current){stopCapture(current);return;}
@@ -39,10 +41,11 @@ function createVoiceInput({Speech,button,feedback,onRequest,onBeforeListen,onUna
    const changed=text!==attempt.transcript;if(text)attempt.transcript=text;
    if(results.some(r=>r.isFinal===true)){stopCapture(attempt);return;}
    // Repeated identical interim events must not postpone the trigger forever.
-   if(text&&changed&&!attempt.stopping)later(attempt,'silence',()=>stopCapture(attempt),650);
+   if(text&&changed&&!attempt.stopping)later(attempt,'silence',()=>stopCapture(attempt),silenceDelay(text));
   };
-  recognition.onspeechend=()=>stopCapture(attempt);
-  recognition.onsoundend=()=>{if(attempt.transcript)stopCapture(attempt);};
+  function speechEnded(){if(attempt.transcript&&silenceDelay(attempt.transcript)>650&&!attempt.stopping){if(!attempt.timers.has('silence'))later(attempt,'silence',()=>stopCapture(attempt),1400);}else stopCapture(attempt);}
+  recognition.onspeechend=speechEnded;
+  recognition.onsoundend=()=>{if(attempt.transcript)speechEnded();};
   recognition.onaudioend=()=>{if(attempt.stopping&&attempt.transcript)finish(attempt);};
   recognition.onend=()=>{attempt.ended=true;finish(attempt);};
   recognition.onerror=event=>{

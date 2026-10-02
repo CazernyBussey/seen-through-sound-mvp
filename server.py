@@ -145,7 +145,7 @@ def resolve(q):
     return max(choices,key=lambda x:x[0])[1] if choices else None
 
 def reply(message,session=None):
-    q=norm(message);session=session or {};out={'text':'','results':[],'action':None,'session':{k:v for k,v in session.items() if k in ['podcast','last_id','playing_id']}}
+    message=re.sub(r'\bpod\s+cast\b','podcast',message,flags=re.I);q=norm(message);session=session or {};out={'text':'','results':[],'action':None,'session':{k:v for k,v in session.items() if k in ['podcast','last_id','playing_id']}}
     def answer(text,items=[],action=None):
         out.update(text=text,results=cards(items),action=action);return out
     if re.fullmatch(r'(hello|hi|hey|greeting|good morning|good afternoon|good evening)( etib)?',q):return answer('Welcome to Talk to ETIB. Say Play ETIB Radio, Play the latest Experience episode, Show upcoming events, or Take me to ETIB Facebook. Select Speak a request for each new voice command.')
@@ -167,6 +167,9 @@ def reply(message,session=None):
         if ident and ident not in [r['id'] for r in pool]:
             for key in ['wp','experience','radio_podcast','seen']:pool+=source(key)['items']
         dest=next((x for x in pool if x['id']==ident),None)
+    if play and 'spotify' in q and dest and dest['id'] in ['experience','radio_podcast','radio']:
+        kind='radio_podcast' if dest['id']=='radio' else dest['id'];podcast=next(r for r in REGISTRY if r['id']==kind)
+        return answer('Opening '+podcast['name']+' on Spotify.',action={'type':'navigate','url':SPOTIFY if kind=='radio_podcast' else 'https://open.spotify.com/show/2ejjSEAbngiJDrvqiN6vR6'})
     if navigation and dest:
         out['session']['last_id']=dest['id'];return answer('Opening '+dest.get('title',dest.get('name'))+'.',[dict(dest,title=dest.get('title',dest.get('name')))],{'type':'navigate','url':dest['url']})
     if dest and dest['id']=='radio' and (play or 'radio' in q) and 'podcast' not in q:
@@ -184,7 +187,7 @@ def reply(message,session=None):
         item=found[0];out['session']['last_id']=item['id']
         if play:out['session']['playing_id']=item['id']
         txt=('Latest available episode: ' if latest and s['live'] else 'Episode found: ')+item['title']+'. '+freshness(s)
-        if item.get('preview'):txt+=' The official Spotify player will open here. Spotify may limit embedded playback to a preview. Use the episode link for the full conversation.'
+        if item.get('preview'):txt+=' The Spotify preview is ready. Use the full episode link to continue listening on Spotify.'
         return answer(txt,found,{'type':'spotify' if item.get('preview') else 'play','item':cards([item])[0]} if play and item.get('media') else None)
     if dest and dest['id']=='seen':
         if play or not re.search(r'\b(show|find|search|what|about|describe|tell)\b',q):

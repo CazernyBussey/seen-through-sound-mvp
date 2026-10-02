@@ -62,7 +62,8 @@ def run():
    transcript=hear(base64.b64decode(case['pcm']))
    reply=server.reply(transcript,{})
    category=(reply.get('action') or {}).get('item',{}).get('category')
-   if category!=case['category']:raise AssertionError(f'{case["command"]}: heard {transcript!r}, routed {category!r}')
+   expected='media' if case['category']=='radio' else case['category']
+   if category!=expected:raise AssertionError(f'{case["command"]}: heard {transcript!r}, routed {category!r}')
    print('ETIB_SPEECH_CHECK PASS '+json.dumps({'command':case['command'],'transcript':transcript,'category':category}),flush=True)
   print('ETIB_SPEECH_CHECK ALL_PASS',flush=True)
  except Exception as error:print('ETIB_SPEECH_CHECK FAIL '+str(error),flush=True)

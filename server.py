@@ -1,4 +1,4 @@
-"""Talk to ETIB: public-source retrieval and allowlisted actions, no paid providers."""
+"""Talk to ETIB: public-source retrieval, allowlisted actions, and connected managed speech."""
 import base64, concurrent.futures, datetime as dt, email.utils, html, json, os, re, threading, time, unicodedata
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 from pathlib import Path

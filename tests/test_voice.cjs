@@ -17,9 +17,10 @@ assert.deepEqual(v.requests,[],'Do not run actions while microphone is still cap
 v.recognition.onend();assert.deepEqual(v.requests,['Play ETIB Radio']);assert.equal(v.button.attributes['aria-pressed'],'false');
 v.controller.setBusy(true);v.click();assert.equal(v.recognition.starts,1,'Do not silently lose a new request while an answer is pending');v.controller.setBusy(false);
 v.click();v.recognition.onstart();v.recognition.onresult({results:[[{transcript:'Take me to ETIB Facebook'}]]});v.click();v.recognition.onend();assert.equal(v.requests.length,1,'Cancel must not execute a partially captured command');
-for(const error of ['not-allowed','audio-capture','network','no-speech']){v=setup();v.click();v.recognition.onerror({error});v.recognition.onend();assert.equal(v.requests.length,0);assert.match(v.feedback.at(-1),/microphone|speech|dictation/i);assert.equal(v.button.textContent,'Speak a request');}
+for(const error of ['not-allowed','audio-capture','network','no-speech']){v=setup();v.click();v.recognition.onerror({error});v.recognition.onend();assert.equal(v.requests.length,0);assert.match(v.feedback.at(-1),/microphone|speech|dictation/i);assert.equal(v.button.textContent,'Speak now');}
 v=setup();v.click();v.recognition.onstart();v.recognition.onend();assert.match(v.feedback.at(-1),/No request was heard/);
-v=setup(false);v.click();assert.match(v.feedback.at(-1),/dictation and select Send/);
+v=setup(false);v.click();assert.match(v.feedback.at(-1),/voice assistant in Help and options/);
 console.log('Voice input tests passed: capture completion, command dispatch, cancellation, pending requests, denied/unavailable microphone, no speech, unsupported browser.');
 
 const unavailableButton={setAttribute(){},addEventListener(type,fn){this.click=fn}};const messages=[];context.createVoiceInput({Speech:class{constructor(){throw new Error('unavailable')}},button:unavailableButton,feedback:t=>messages.push(t),onUnavailable(){},onBeforeListen(){},onRequest(){throw Error('must not submit')}});unavailableButton.click();assert.match(messages[0],/does not support/);
+

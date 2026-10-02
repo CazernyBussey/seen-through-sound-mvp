@@ -62,3 +62,10 @@ Microphone requests now expose starting/listening/heard/error states and run aft
 Run `node tests/test_voice.cjs` for microphone lifecycle/dispatch/cancellation/error regression checks and `python tests/test_backend.py` for routing/source checks. These simulated input checks do not verify physical microphone transcription, actual speaker output, or iPhone VoiceOver.
 
 The greeting uses a static MP3 generated with the installed FFmpeg/Flite slt voice, served by this app. This works independently of browser speech synthesis and makes no per-visit synthesis calls. ElevenLabs was estimated only (156.312 credits, approximately $0.0261); no generation was run or charged. Read last answer and optional automatic replies still require a working browser speech engine.
+
+
+## Voice player update, October 2, 2026
+
+The main screen has no text entry, Send button, or conversation history. Speak now handles one command, clears the transient recognized request, and returns ready after completion. New results replace prior results. Player controls remain available; no focus is moved to a response heading for successful playback. Direct media automatically attempts playback; radio and pause/resume/stop are handled locally when possible. Audio is primed silently during the initial Speak user gesture, but browser restrictions can still require one Play tap. Radio Podcast commands automatically play the explicitly labeled Spotify preview when available; the full episode link remains available. Full Radio Podcast automatic playback requires a full direct-audio feed, which is not currently configured. Source discovery is on demand with a five-minute cache, not a duplicate upload pipeline. Real iPhone microphone, VoiceOver, and post-recognition playback remain unverified until device testing.
+
+Validation: `node tests/test_voice.cjs` and `node tests/test_player.cjs`. Player checks simulate recognized commands and media promises; they do not establish physical browser playback. This voice-player section supersedes earlier descriptions of text entry, Send, and conversation history.

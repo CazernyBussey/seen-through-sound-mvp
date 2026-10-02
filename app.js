@@ -58,7 +58,7 @@ window.addEventListener('message',e=>{if(!allowedParents.has(e.origin)||e.source
 let parentOrigin=location.origin;
 $('close').addEventListener('click',()=>{stop();silence();window.parent.postMessage({type:'etib:close'},parentOrigin)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&embedded){e.preventDefault();$('close').click()}});
-if(window.parent!==window)window.parent.postMessage({type:'etib:ready'},new URL(document.referrer||location.href).origin);
+if(window.parent!==window)window.parent.postMessage({type:'etib:ready'},'*');
 function releaseVoice(){voiceInput?.abort();if(isCue())$('audio').pause();}
 window.addEventListener('pagehide',()=>{stop();silence();releaseVoice();$('audio').pause()});
 // A microphone permission sheet can temporarily hide Safari. Pagehide and the

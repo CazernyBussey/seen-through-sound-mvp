@@ -21,3 +21,5 @@ for(const error of ['not-allowed','audio-capture','network','no-speech']){v=setu
 v=setup();v.click();v.recognition.onstart();v.recognition.onend();assert.match(v.feedback.at(-1),/No request was heard/);
 v=setup(false);v.click();assert.match(v.feedback.at(-1),/dictation and select Send/);
 console.log('Voice input tests passed: capture completion, command dispatch, cancellation, pending requests, denied/unavailable microphone, no speech, unsupported browser.');
+
+const unavailableButton={setAttribute(){},addEventListener(type,fn){this.click=fn}};const messages=[];context.createVoiceInput({Speech:class{constructor(){throw new Error('unavailable')}},button:unavailableButton,feedback:t=>messages.push(t),onUnavailable(){},onBeforeListen(){},onRequest(){throw Error('must not submit')}});unavailableButton.click();assert.match(messages[0],/does not support/);

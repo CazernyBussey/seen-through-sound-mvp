@@ -3,17 +3,18 @@
 // replies or media cannot be captured as a second command.
 function createVoiceInput({Speech, button, feedback, onRequest, onBeforeListen, onUnavailable}) {
  let recognition=null, active=false, starting=false, busy=false, transcript='', failed=false, canceled=false;
- const idleLabel=Speech?'Speak a request':'Voice input help';
+ let idleLabel='Voice input help';
+ if(Speech){try{recognition=new Speech();idleLabel='Speak a request';}catch{recognition=null;}}
  function reset(){active=false;starting=false;button.textContent=idleLabel;button.setAttribute('aria-pressed','false');button.disabled=busy;}
  function abort(){canceled=true;transcript='';if(active||starting){try{recognition.abort()}catch{} }reset();}
  function setBusy(value){busy=value;button.disabled=value;}
- if(Speech){
-  recognition=new Speech();recognition.lang='en-US';recognition.interimResults=false;recognition.continuous=false;
+ if(recognition){
+  recognition.lang='en-US';recognition.interimResults=false;recognition.continuous=false;
   recognition.onstart=()=>{starting=false;active=true;button.textContent='Stop listening';button.setAttribute('aria-pressed','true');feedback('Listening. Say a request, such as Play ETIB Radio.');};
   recognition.onresult=event=>{for(let i=event.resultIndex||0;i<event.results.length;i++){if(event.results[i].isFinal!==false)transcript+=event.results[i][0].transcript+' ';}};
   recognition.onerror=event=>{if(canceled&&event.error==='aborted')return;failed=true;const messages={
    'not-allowed':'Microphone access was not allowed. Open this site in Safari or Chrome and allow its microphone. You can also use keyboard dictation, then select Send.',
-   'service-not-allowed':'This browser cannot start its speech service. Open this site in Safari or Chrome, or use keyboard dictation and select Send.',
+   'service-not-allowed':'This browser cannot start its speech service. On iPhone, open the site in Safari and check that Siri or Dictation is enabled. You can also use keyboard dictation and select Send.',
    'audio-capture':'No microphone was available. Check that your device has an enabled microphone, or use keyboard dictation and select Send.',
    'network':'The browser speech service could not connect. Try again, or use keyboard dictation and select Send.',
    'no-speech':'No speech was heard. Select Speak a request and try again.',

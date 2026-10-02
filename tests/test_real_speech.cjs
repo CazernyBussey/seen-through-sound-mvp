@@ -5,7 +5,7 @@ async function hear(text){
  const pcm=execFileSync('ffmpeg',['-v','error','-f','lavfi','-i',`flite=text='${text}':voice=slt`,'-ar','16000','-ac','1','-f','s16le','pipe:1']);
  return new Promise((resolve,reject)=>{let interval;const ws=new WebSocket('wss://api.elevenlabs.io/v1/convai/conversation?agent_id=agent_4101m3yxcvtrexwvrbt19h2kqyfp','convai',{headers:{Origin:'https://talk-to-etib.onrender.com'}});const timer=setTimeout(()=>done(new Error('ASR timeout')),20000);
  function done(error,text){clearTimeout(timer);clearInterval(interval);ws.close();error?reject(error):resolve(text);}
- ws.on('open',()=>ws.send(JSON.stringify({type:'conversation_initiation_client_data',source_info:{source:'ETIB integration test',version:'1'}})));
+ ws.on('open',()=>ws.send(JSON.stringify({type:'conversation_initiation_client_data',source_info:{source:'js_sdk',version:'1'}})));
  ws.on('error',e=>done(e));ws.on('close',(code,reason)=>{if(code!==1000)done(new Error('Closed '+code+' '+reason))});
  ws.on('message',raw=>{const e=JSON.parse(raw);if(e.type==='ping')ws.send(JSON.stringify({type:'pong',event_id:e.ping_event.event_id}));if(e.type==='conversation_initiation_metadata'){let offset=0;const audio=Buffer.concat([pcm,Buffer.alloc(16000*2*3)]);interval=setInterval(()=>{if(offset>=audio.length){clearInterval(interval);return;}ws.send(JSON.stringify({user_audio_chunk:audio.subarray(offset,offset+640).toString('base64')}));offset+=640;},20);}if(e.type==='user_transcript')done(null,e.user_transcription_event.user_transcript);});
  });

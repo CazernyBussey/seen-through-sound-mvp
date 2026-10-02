@@ -41,7 +41,7 @@ def hear(pcm):
     send({'user_audio_chunk':base64.b64encode(audio[offset:offset+640]).decode()});time.sleep(.02)
   except OSError:pass
  try:
-  send({'type':'conversation_initiation_client_data','source_info':{'source':'ETIB synthetic integration check','version':'1'}})
+  send({'type':'conversation_initiation_client_data','source_info':{'source':'js_sdk','version':'1'}})
   deadline=time.monotonic()+20
   while time.monotonic()<deadline:
    event=read()

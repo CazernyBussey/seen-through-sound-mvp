@@ -14,6 +14,7 @@ SNAPSHOT=json.loads((ROOT/'snapshot.json').read_text())
 CACHE={}; FETCHING=set(); LOCK=threading.Lock(); POOL=concurrent.futures.ThreadPoolExecutor(max_workers=6)
 WP='https://public-api.wordpress.com/rest/v1.1/sites/244196168/posts/'
 FEED='https://anchor.fm/s/1046548ac/podcast/rss'
+RADIO_FEED='https://anchor.fm/s/11630f9b4/podcast/rss'
 SPOTIFY='https://open.spotify.com/show/6302Iby2KZMf4MWYq2sr16'
 EXPERIENCE_SPOTIFY='https://open.spotify.com/show/2ejjSEAbngiJDrvqiN6vR6'
 
@@ -49,23 +50,35 @@ def load_wp():
         if page*100>=raw.get('found',0) or not raw.get('posts'):break
     return items
 
-def load_experience_feed():
-    root=ET.fromstring(fetch(FEED));items=[]
+def load_podcast_feed(feed,category,spotify_url):
+    root=ET.fromstring(fetch(feed));items=[]
     for x in root.findall('./channel/item'):
         enc=x.find('enclosure');media=enc.get('url','') if enc is not None else ''
         try:date=email.utils.parsedate_to_datetime(x.findtext('pubDate','')).isoformat()
         except Exception:date=''
         url=x.findtext('link','')
-        if not safe_url(url):url=next(r['url'] for r in REGISTRY if r['id']=='experience')
+        if not safe_url(url):url=next(r['url'] for r in REGISTRY if r['id']==category)
         # The RSS enclosure wraps its public MP3 in an analytics redirect.
         direct=re.search(r'https%3A%2F%2Fd3ctxlq1ktw2nl\.cloudfront\.net%2F[^?]+',media,re.I)
         if direct:
             from urllib.parse import unquote
             decoded=unquote(direct[0])
             if safe_url(decoded,True):media=decoded
-        items.append(dict(id='experience-'+str(len(items)),title=clean(x.findtext('title')),description=clean(x.findtext('description')),text=clean(x.findtext('description')),date=date,url=url,spotify_url=EXPERIENCE_SPOTIFY,media=media if safe_url(media,True) else '',category='experience',preview=False))
+        items.append(dict(id=category+'-'+str(len(items)),title=clean(x.findtext('title')),description=clean(x.findtext('description')),text=clean(x.findtext('description')),date=date,url=url,spotify_url=spotify_url,media=media if safe_url(media,True) else '',category=category,preview=False))
     if not items:raise ValueError('No episodes')
     return sorted(items,key=lambda x:x['date'],reverse=True)
+
+def load_experience_feed():
+    return load_podcast_feed(FEED,'experience',EXPERIENCE_SPOTIFY)
+
+def load_radio_podcast():
+    # Full RSS enclosures are required; unavailable sources use the saved full feed.
+    items=load_podcast_feed(RADIO_FEED,'radio_podcast',SPOTIFY)
+    for item in items:
+        saved=next((x for x in SNAPSHOT.get('radio_podcast',{}).get('items',[]) if norm(x['title'])==norm(item['title'])),None)
+        if saved and safe_url(saved.get('spotify_url',saved.get('url',''))):
+            item['spotify_url']=saved.get('spotify_url',saved['url'])
+    return items
 
 def parse_spotify(s,show_id='6302Iby2KZMf4MWYq2sr16',category='radio_podcast'):
     m=re.search(r'<script id="initialState"[^>]*>(.*?)</script>',s,re.S)
@@ -99,7 +112,7 @@ def load_seen():
         media=next((u for u in [x.get('processed_audio_url'),x.get('original_audio_url')] if u and safe_url(u,True)),'')
         items.append(dict(id='seen-'+str(x['id']),title=x.get('title') or 'Encouragement message',description='Shared by '+('Anonymous' if x.get('anonymous') else x.get('speaker_name') or 'Anonymous'),text='',url='https://cazernybussey.github.io/seen-through-sound-mvp/playlist.html',media=media if safe_url(media,True) else '',date=x.get('published_at') or '',category='seen',preview=False))
     return items
-LOADERS={'wp':load_wp,'experience':load_experience,'radio_podcast':lambda:parse_spotify(fetch(SPOTIFY)),'seen':load_seen}
+LOADERS={'wp':load_wp,'experience':load_experience,'radio_podcast':load_radio_podcast,'seen':load_seen}
 
 def source(key):
     with LOCK:
@@ -210,8 +223,6 @@ def reply(message,session=None):
         item=found[0];out['session']['last_id']=item['id']
         if play:out['session']['playing_id']=item['id']
         txt=('Latest available episode: ' if latest and s['live'] else 'Episode found: ')+item['title']+'. '+freshness(s)
-        if play and kind=='radio_podcast' and 'preview' not in q and 'snippet' not in q:
-            return answer('Opening the full Radio Podcast episode in Spotify: '+item['title']+'.',found,{'type':'navigate','url':item.get('spotify_url',item['url'])})
         if item.get('preview'):txt+=' The Spotify preview is ready. Use the full episode link to continue listening on Spotify.'
         return answer(txt,found,{'type':'spotify' if item.get('preview') else 'play','item':cards([item])[0]} if play and (item.get('media') or item.get('preview')) else None)
     if dest and dest['id']=='seen':

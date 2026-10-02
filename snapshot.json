@@ -463,66 +463,66 @@
   "radio_podcast": {
     "items": [
       {
-        "id": "radio_podcast-0KClPNgnkPVhhShFGhtTgv",
+        "id": "radio_podcast-0",
         "title": "Davonte After Dark on Even Though I’m Blind Radio",
         "description": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring Davonte After Dark",
         "text": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring Davonte After Dark",
-        "date": "2026-09-23T20:31:00Z",
-        "url": "https://open.spotify.com/episode/0KClPNgnkPVhhShFGhtTgv",
+        "date": "2026-09-23T20:31:39+00:00",
+        "url": "https://podcasters.spotify.com/pod/show/eventhoughimblind3/episodes/Davonte-After-Dark-on-Even-Though-Im-Blind-Radio-e3pa4qt",
         "spotify_url": "https://open.spotify.com/episode/0KClPNgnkPVhhShFGhtTgv",
-        "media": "https://p.scdn.co/mp3-preview/adf55566baf19821a5a90a8d3a0ea45b11237c5d.mp3",
+        "media": "https://d3ctxlq1ktw2nl.cloudfront.net/staging/2026-8-23/432532862-44100-2-f242992977322.m4a",
         "category": "radio_podcast",
-        "preview": true
+        "preview": false
       },
       {
-        "id": "radio_podcast-4u1ai6NMxdAlCdR5ixSlu5",
+        "id": "radio_podcast-1",
         "title": "One2cee on Even Though I’m Blind Radio",
         "description": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring One2cee",
         "text": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring One2cee",
-        "date": "2026-09-23T01:38:00Z",
-        "url": "https://open.spotify.com/episode/4u1ai6NMxdAlCdR5ixSlu5",
+        "date": "2026-09-23T01:38:51+00:00",
+        "url": "https://podcasters.spotify.com/pod/show/eventhoughimblind3/episodes/One2cee-on-Even-Though-Im-Blind-Radio-e3p8t6d",
         "spotify_url": "https://open.spotify.com/episode/4u1ai6NMxdAlCdR5ixSlu5",
-        "media": "https://p.scdn.co/mp3-preview/af4fa146c9969c2f237f4bcebde5f3a75236311e.mp3",
+        "media": "https://d3ctxlq1ktw2nl.cloudfront.net/staging/2026-8-23/0c644836-eced-75ed-49c7-76f843ef6cc0.mp3",
         "category": "radio_podcast",
-        "preview": true
+        "preview": false
       },
       {
-        "id": "radio_podcast-2zavBw7R3NRYXRfEIWWuwn",
+        "id": "radio_podcast-2",
         "title": "JaySly on Even Though I’m Blind Radio",
         "description": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring JaySly",
         "text": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring JaySly",
-        "date": "2026-09-23T01:19:00Z",
-        "url": "https://open.spotify.com/episode/2zavBw7R3NRYXRfEIWWuwn",
+        "date": "2026-09-23T01:19:14+00:00",
+        "url": "https://podcasters.spotify.com/pod/show/eventhoughimblind3/episodes/JaySly-on-Even-Though-Im-Blind-Radio-e3p8slu",
         "spotify_url": "https://open.spotify.com/episode/2zavBw7R3NRYXRfEIWWuwn",
-        "media": "https://p.scdn.co/mp3-preview/59847cea76b5a985f04c68e63e01e69f33f64c12.mp3",
+        "media": "https://d3ctxlq1ktw2nl.cloudfront.net/staging/2026-8-23/12a11ef5-2bb4-a322-1dbb-56bc3c703646.mp3",
         "category": "radio_podcast",
-        "preview": true
+        "preview": false
       },
       {
-        "id": "radio_podcast-6pKTFEWOSugN8kTAvZr67u",
+        "id": "radio_podcast-3",
         "title": "Oryan Battis & Solo Boogie on Even Though I’m Blind Radio",
         "description": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring Oryan Battis & Solo Boogie",
         "text": "ETIB Radio Podcast Hosted by Ariana Dewberry & Cazerny Bussey featuring Oryan Battis & Solo Boogie",
-        "date": "2026-09-23T00:53:00Z",
-        "url": "https://open.spotify.com/episode/6pKTFEWOSugN8kTAvZr67u",
+        "date": "2026-09-23T00:53:31+00:00",
+        "url": "https://podcasters.spotify.com/pod/show/eventhoughimblind3/episodes/Oryan-Battis--Solo-Boogie-on-Even-Though-Im-Blind-Radio-e3p8rsj",
         "spotify_url": "https://open.spotify.com/episode/6pKTFEWOSugN8kTAvZr67u",
-        "media": "https://p.scdn.co/mp3-preview/c09aa30f779f17c967c6b7930a423427a6e21f0a.mp3",
+        "media": "https://d3ctxlq1ktw2nl.cloudfront.net/staging/2026-8-23/b6648b44-1e63-629e-4f5a-3aae1581ba46.mp3",
         "category": "radio_podcast",
-        "preview": true
+        "preview": false
       },
       {
-        "id": "radio_podcast-56CnS5GREP7z8E4Su6NHso",
+        "id": "radio_podcast-4",
         "title": "DMAAN on Even Though I’m Blind Radio",
         "description": "ETIB Radio Podcast | Hosted by Ariana Dewberry & Cazerny Bussey featuring DMAAN.",
         "text": "ETIB Radio Podcast | Hosted by Ariana Dewberry & Cazerny Bussey featuring DMAAN.",
-        "date": "2026-08-18T18:01:00Z",
-        "url": "https://open.spotify.com/episode/56CnS5GREP7z8E4Su6NHso",
+        "date": "2026-08-18T18:01:33+00:00",
+        "url": "https://podcasters.spotify.com/pod/show/eventhoughimblind3/episodes/DMAAN-on-Even-Though-Im-Blind-Radio-e3nisth",
         "spotify_url": "https://open.spotify.com/episode/56CnS5GREP7z8E4Su6NHso",
-        "media": "https://p.scdn.co/mp3-preview/1c1e7f5d84e4c2930958edd96a6c7349304ab009.mp3",
+        "media": "https://d3ctxlq1ktw2nl.cloudfront.net/staging/2026-7-18/7a427068-7b83-c029-0b25-45b4f96c9054.mp3",
         "category": "radio_podcast",
-        "preview": true
+        "preview": false
       }
     ],
-    "checked": "2026-10-02T15:04:12.840953+00:00"
+    "checked": "2026-10-02T16:46:36.405588+00:00"
   }
 }

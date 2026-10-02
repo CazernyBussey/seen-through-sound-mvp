@@ -3,6 +3,8 @@ from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]));import server
 for key,value in server.SNAPSHOT.items():
  if isinstance(value,dict):server.CACHE[key]=dict(value,live=True,timestamp=server.time.time())
+# Deterministic published-message fixture; no unrelated live service in routing tests.
+server.CACHE['seen']=dict(items=[dict(id='seen-fixture',title='Encouragement',media='https://wrczpnhesorptjzwdizd.supabase.co/storage/v1/object/public/audio/test.mp3',url='https://cazernybussey.github.io/seen-through-sound-mvp/playlist.html',category='seen',preview=False)],live=True,checked='2026-10-02',timestamp=server.time.time())
 def check(q,session=None):
  r=server.reply(q,session);print(q,'=>',r['text'][:100],r['action']['type'] if r['action'] else 'none');return r
 r=check('Take me to ETIB Facebook');assert r['action']['url'].startswith('https://www.facebook.com/share/')
@@ -27,11 +29,11 @@ assert check('Seen Through Sound')['action']['item']['id']==seen[0]['id']
 server.CACHE['seen']['items']=seen
 for q,a in [('Pause' ,'pause'),('Resume','resume'),('Stop','stop')]:assert check(q)['action']['type']==a
 r=check('Play the latest ETIB Experience episode');assert r['action']['type']=='play' and not r['results'][0]['preview']
-r=check('Play the latest ETIB Radio Podcast episode');assert r['action']['type']=='navigate' and r['action']['url']==server.CACHE['radio_podcast']['items'][0]['url']
+r=check('Play the latest ETIB Radio Podcast episode');assert r['action']['type']=='play' and not r['action']['item']['preview'] and r['action']['item']['media']==server.CACHE['radio_podcast']['items'][0]['media']
 radio=server.CACHE['radio_podcast']['items'];server.CACHE['radio_podcast']['items']=[dict(radio[0],media=''),*radio[1:]]
-assert check('Play Even Though I’m Blind Radio Podcast')['action']['type']=='navigate'
+assert check('Play Even Though I’m Blind Radio Podcast')['action'] is None
 server.CACHE['radio_podcast']['items']=radio
-r=check('Play the latest episode');assert r['action']['type']=='navigate'
+r=check('Play the latest episode');assert r['action']['type']=='play' and r['action']['item']['category']=='radio_podcast'
 r=check('Find the episode with Angela Harris',{'podcast':'experience'});assert 'Angela' in r['results'][0]['title']
 r=check('Find an old article about accessibility');assert r['results']
 r=check('What is the newest ETIB blog post?');assert 'Dear Fathers' in r['results'][0]['title']
@@ -55,7 +57,15 @@ assert matched['preview_media']==preview['media'] and matched['spotify_url']==pr
 server.load_experience_feed,server.fetch,server.parse_spotify=original_feed,original_fetch,original_parse
 print('PASS: Experience RSS failure uses Spotify preview; full episode retains matching preview fallback.')
 
-assert check('Play episode')['action']['url']==server.CACHE['radio_podcast']['items'][0]['url']
-assert check('Play full episode',{'podcast':'radio_podcast'})['action']['type']=='navigate'
-assert check('Play latest Radio Podcast preview')['action']['type']=='spotify'
+assert check('Play episode')['action']['item']['media']==server.CACHE['radio_podcast']['items'][0]['media']
+assert check('Play full episode',{'podcast':'radio_podcast'})['action']['type']=='play'
+assert not check('Play latest Radio Podcast')['action']['item']['preview']
 assert check('Play episode',{'podcast':'experience'})['action']['type']=='play'
+
+# Radio RSS sorts by publication time and decodes full enclosures, never previews.
+original_fetch=server.fetch
+server.fetch=lambda url: '<rss><channel><item><title>Older</title><pubDate>Tue, 22 Sep 2026 00:00:00 GMT</pubDate><enclosure url="https://anchor.fm/s/test/podcast/play/1/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Folder.mp3" /></item><item><title>Newest</title><pubDate>Wed, 23 Sep 2026 00:00:00 GMT</pubDate><enclosure url="https://anchor.fm/s/test/podcast/play/2/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fnew.m4a" /></item></channel></rss>'
+parsed=server.load_radio_podcast()
+assert parsed[0]['title']=='Newest' and parsed[0]['media']=='https://d3ctxlq1ktw2nl.cloudfront.net/new.m4a' and not parsed[0]['preview']
+server.fetch=original_fetch
+print('PASS: Radio RSS full enclosures, date ordering, native playback, and missing-audio handling.')

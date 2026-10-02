@@ -216,10 +216,10 @@ class Handler(BaseHTTPRequestHandler):
         path=urlparse(self.path).path
         if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','paid_services':False}).encode())
         if path=='/api/registry':return self.send(200,json.dumps(REGISTRY).encode())
-        mapping={'/':'index.html','/index.html':'index.html','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
+        mapping={'/':'index.html','/index.html':'index.html','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
         f=mapping.get(path)
         if not f:return self.send(404,b'{"error":"Not found"}')
-        kind='text/html; charset=utf-8' if f.endswith('html') else 'text/javascript; charset=utf-8' if f.endswith('js') else 'text/css; charset=utf-8'
+        kind='audio/mpeg' if f.endswith('mp3') else 'text/html; charset=utf-8' if f.endswith('html') else 'text/javascript; charset=utf-8' if f.endswith('js') else 'text/css; charset=utf-8'
         self.send(200,(ROOT/f).read_bytes(),kind)
     def do_POST(self):
         if self.path!='/api/chat':return self.send(404,b'{"error":"Not found"}')

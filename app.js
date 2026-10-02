@@ -5,7 +5,7 @@ const approvedHosts=new Set(['eventhoughimblind.com','eventhoughimblind.wordpres
 function safeURL(value,media=false){try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&(!u.port||u.port==='443')&&(approvedHosts.has(u.hostname)||(media&&(u.hostname.endsWith('.cloudfront.net')||u.hostname.endsWith('.spotify.com')||u.hostname.endsWith('.scdn.co'))))?u.href:null}catch{return null}}
 function status(text){$('status').textContent=text}
 let spokenUtterance=null, speechTimer=null;
-function silence(){clearTimeout(speechTimer);spokenUtterance=null;if('speechSynthesis'in window)window.speechSynthesis.cancel()}
+function silence(){$('greeting-audio').pause();clearTimeout(speechTimer);spokenUtterance=null;if('speechSynthesis'in window)window.speechSynthesis.cancel()}
 function read(text,explicit=false){
  if(!explicit&&!$('read-aloud').checked)return;
  if(!('speechSynthesis'in window)){ $('voice-status').textContent='Spoken output is unavailable in this browser. Your screen reader can read the greeting and answers.';return; }
@@ -34,10 +34,12 @@ $('ask').addEventListener('submit',e=>{e.preventDefault();send($('question').val
 $('audio').addEventListener('playing',()=>{$('media-status').textContent='Playing: '+$('track').textContent});$('audio').addEventListener('pause',()=>{if(selected&&!$('audio').ended&&$('audio').getAttribute('src'))$('media-status').textContent='Paused: '+$('track').textContent});$('audio').addEventListener('ended',()=>{$('media-status').textContent='Finished: '+$('track').textContent});$('audio').addEventListener('error',()=>{if(selected&&$('audio').getAttribute('src')){$('media-status').textContent='Audio could not be loaded. Try Play selected audio or open the official media page.'}});
 const Speech=window.SpeechRecognition||window.webkitSpeechRecognition;
 voiceInput=createVoiceInput({Speech,button:$('speak'),feedback:text=>{$('voice-status').textContent=text},onRequest:message=>{$('question').value=message;send(message)},onBeforeListen:()=>{silence();if(selected&&(!$('audio').paused||spotifyActive))pause()},onUnavailable:()=>{$('question').focus()}});
-$('greet').addEventListener('click',()=>read($('greeting').textContent,true));
+$('greet').addEventListener('click',()=>{voiceInput?.abort();silence();if(selected&&(!$('audio').paused||spotifyActive))pause();const audio=$('greeting-audio');audio.hidden=false;audio.currentTime=0;audio.play().catch(()=>{$('voice-status').textContent='Greeting playback could not start. Use Play in the greeting audio controls, or check your device volume.';audio.focus()})});
+$('greeting-audio').addEventListener('playing',()=>{$('voice-status').textContent='Playing greeting. Use Stop spoken answer to stop.'});
+$('greeting-audio').addEventListener('ended',()=>{$('voice-status').textContent='Greeting finished. Select Speak a request to tell ETIB what to open or play.'});
 $('read-answer').addEventListener('click',()=>read($('answer').textContent,true));
 if('speechSynthesis'in window)window.speechSynthesis.getVoices();
-else{$('read-aloud').disabled=true;$('greet').disabled=true;$('read-answer').disabled=true;$('silence').hidden=true;}
+else{$('read-aloud').disabled=true;$('read-answer').disabled=true;$('silence').hidden=true;}
 const allowedParents=new Set([location.origin,'https://eventhoughimblind.com','https://eventhoughimblind.wordpress.com']);
 window.addEventListener('message',e=>{if(!allowedParents.has(e.origin)||e.source!==window.parent)return;if(e.data?.type==='etib:initialize'){embedded=true;parentOrigin=e.origin;$('close').hidden=false;$('question').focus()}if(e.data?.type==='etib:stop'){stop();voiceInput?.abort()}});
 let parentOrigin=location.origin;

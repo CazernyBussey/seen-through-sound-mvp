@@ -23,7 +23,7 @@ async function microphoneCue(frequency,requireListening=false){
  try{
   const context=listeningCueContext;
   if(!context)return;
-  await context.resume();
+  await Promise.race([context.resume(),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Audio cue unavailable')),250))]);
   if(requireListening&&!voiceInput?.isListening())return;
   await new Promise(resolve=>{
    const oscillator=context.createOscillator(),gain=context.createGain(),now=context.currentTime;
@@ -35,11 +35,11 @@ async function microphoneCue(frequency,requireListening=false){
    }
    oscillator.frequency.value=frequency;
    gain.gain.setValueAtTime(0,now);
-   gain.gain.linearRampToValueAtTime(0.12,now+0.01);
-   gain.gain.linearRampToValueAtTime(0,now+0.12);
+   gain.gain.linearRampToValueAtTime(0.3,now+0.015);
+   gain.gain.linearRampToValueAtTime(0,now+0.2);
    oscillator.connect(gain);gain.connect(context.destination);
    oscillator.onended=finish;
-   oscillator.start(now);oscillator.stop(now+0.13);
+   oscillator.start(now);oscillator.stop(now+0.21);
    timer=setTimeout(finish,350);
   });
  }catch{}

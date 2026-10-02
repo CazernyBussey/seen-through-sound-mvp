@@ -7,6 +7,8 @@ from urllib.parse import urlparse, parse_qs
 import xml.etree.ElementTree as ET
 
 ROOT=Path(__file__).parent
+CHAT_SLOTS=threading.BoundedSemaphore(8)
+REQUEST_TIMES=[]
 REGISTRY=json.loads((ROOT/'registry.json').read_text())
 SNAPSHOT=json.loads((ROOT/'snapshot.json').read_text())
 CACHE={}; FETCHING=set(); LOCK=threading.Lock(); POOL=concurrent.futures.ThreadPoolExecutor(max_workers=6)
@@ -147,9 +149,9 @@ def reply(message,session=None):
     def answer(text,items=[],action=None):
         out.update(text=text,results=cards(items),action=action);return out
     if not q:return answer('Type a question or choose What can I ask.')
-    if re.fullmatch(r'(please )?(pause|pause it|pause audio)',q):return answer('Pause requested.',action={'type':'pause'})
-    if re.fullmatch(r'(please )?(resume|resume it|continue|continue playing|unpause)',q):return answer('Resume requested.',action={'type':'resume'})
-    if re.fullmatch(r'(please )?(stop|stop it|stop audio|stop playing)',q):return answer('Stop requested.',action={'type':'stop'})
+    if re.fullmatch(r'(please )?(pause|pause (?:it|audio|the radio|the podcast|the episode|the music))',q):return answer('Pause requested.',action={'type':'pause'})
+    if re.fullmatch(r'(please )?(resume|resume (?:it|audio|the radio|the podcast|the episode)|continue|continue playing|unpause)',q):return answer('Resume requested.',action={'type':'resume'})
+    if re.fullmatch(r'(please )?(stop|stop (?:it|audio|playing|the radio|the podcast|the episode|the music))',q):return answer('Stop requested.',action={'type':'stop'})
     if any(x in q for x in ['currently playing','what is playing','what s playing','who is this','what am i listening']):return answer('Check the Now playing section for the title and playback state.',action={'type':'identify'})
     if any(x in q for x in ['help','what can i ask','what can you do']):return answer('Try: Play ETIB Radio. Play the latest Experience episode. Find the episode with Angela Harris. Show upcoming events. Find articles about accessibility. Take me to ETIB Facebook. Say pause, resume, or stop to control audio.')
     if any(x in q for x in ['donate for me','send money','submit my','send email','delete','buy ','purchase','pay ']):return answer('I can open an official page for you to review and complete that action yourself. I do not send information, make payments, or change accounts.')
@@ -208,7 +210,7 @@ class Handler(BaseHTTPRequestHandler):
     def send(self,status,body,kind='application/json; charset=utf-8'):
         self.send_response(status);self.send_header('Content-Type',kind);
         if self.path=='/api/registry':self.send_header('Access-Control-Allow-Origin','*')
-        self.send_header('Cache-Control','no-store' if '/api/' in self.path else 'public, max-age=300');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Referrer-Policy','no-referrer');self.send_header('Permissions-Policy','camera=(), geolocation=(), microphone=(self)');self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' https://open.spotify.com https://embed-cdn.spotifycdn.com; style-src 'self'; img-src 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; media-src https:; connect-src 'self' https://open.spotify.com; frame-src 'self' https://open.spotify.com; frame-ancestors 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; base-uri 'none'; form-action 'self'; object-src 'none'");self.end_headers();self.wfile.write(body)
+        self.send_header('Cache-Control','no-store' if '/api/' in self.path else 'public, max-age=300');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Referrer-Policy','no-referrer');self.send_header('Permissions-Policy','camera=(), geolocation=(), microphone=(self)');self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; media-src https:; connect-src 'self'; frame-src 'self' https://open.spotify.com; frame-ancestors 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; base-uri 'none'; form-action 'self'; object-src 'none'");self.end_headers();self.wfile.write(body)
     def do_GET(self):
         path=urlparse(self.path).path
         if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','paid_services':False}).encode())
@@ -220,8 +222,16 @@ class Handler(BaseHTTPRequestHandler):
         self.send(200,(ROOT/f).read_bytes(),kind)
     def do_POST(self):
         if self.path!='/api/chat':return self.send(404,b'{"error":"Not found"}')
+        with LOCK:
+            now=time.monotonic()
+            REQUEST_TIMES[:]=[x for x in REQUEST_TIMES if now-x<60]
+            limited=len(REQUEST_TIMES)>=120
+            if not limited:REQUEST_TIMES.append(now)
+        if limited or not CHAT_SLOTS.acquire(blocking=False):return self.send(429,b'{"error":"ETIB is busy. Please try again shortly."}')
         origin=self.headers.get('Origin');host=self.headers.get('Host')
-        if origin and urlparse(origin).netloc!=host:return self.send(403,b'{"error":"Origin not allowed"}')
+        if origin and urlparse(origin).netloc!=host:
+            CHAT_SLOTS.release()
+            return self.send(403,b'{"error":"Origin not allowed"}')
         try:
             length=int(self.headers.get('Content-Length','0'))
             if not 0<length<=6000:return self.send(413,b'{"error":"Request too large"}')
@@ -230,6 +240,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send(200,json.dumps(reply(message,session)).encode())
         except (ValueError,TypeError):self.send(400,b'{"error":"Please enter a question of 1000 characters or fewer."}')
         except Exception:self.send(503,b'{"error":"ETIB sources are unavailable. Please try again."}')
+        finally:CHAT_SLOTS.release()
 
 if __name__=='__main__':
     # Warm caches without delaying the first page or free-tier health checks.

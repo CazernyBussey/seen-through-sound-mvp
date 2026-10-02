@@ -14,7 +14,7 @@ const radio={id:'radio-latest',category:'radio_podcast',title:'Newest Radio Podc
 const seen=[1,2,3].map(i=>({id:'seen-'+i,category:'seen',title:'Message '+i,url:'https://cazernybussey.github.io/seen-through-sound-mvp/playlist.html',media:'https://wrczpnhesorptjzwdizd.supabase.co/storage/v1/object/public/audio/message-'+i+'.mp3',preview:false}));
 const Conversation={startSession(options){const session={setVolume(){},endSession(){activeCapture=false;return Promise.resolve()}};recognizers.push(options);activeCapture=true;options.onConversationCreated(session);options.onConnect();return Promise.resolve(session)}};
 class AudioContext{constructor(){this.state='running';this.currentTime=0;this.destination={}}createOscillator(){return{frequency:{setValueAtTime(){}},connect(){},disconnect(){},start(){beeps++},stop(){}}}createGain(){return{gain:{setValueAtTime(){},linearRampToValueAtTime(){}},connect(){},disconnect(){}}}}
-const win={AudioContext,ETIBConversation:Conversation,addEventListener(k,f){windowEvents[k]=f},parent:null};win.parent=win;
+const parentMessages=[];const win={postMessage(data,origin){parentMessages.push({data,origin})},AudioContext,ETIBConversation:Conversation,addEventListener(k,f){windowEvents[k]=f},parent:null};win.parent=win;
 const ctx=vm.createContext({document:doc,window:win,URL,location:{origin:'https://test.example',href:'https://test.example',assign(url){this.destination=url}},AbortController,setTimeout:()=>1,clearTimeout(){},fetch:async (url,options)=>({ok:true,json:async()=>url==='/api/audio'?{experience,radio_podcast:radio}:url==='/api/registry'?[]:(backendCalls++,JSON.parse(options.body).message.includes('Seen Through Sound')?{text:'',session:{},action:{type:'play',item:seen[0],queue:[seen[1],{...seen[1],id:'unsafe',media:'https://evil.example/no.mp3'},seen[2]]}}:{text:'',session:{},action:null})})});
 vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../voice.js'),'utf8'),ctx);
 vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../managed-voice.js'),'utf8'),ctx);
@@ -32,5 +32,11 @@ const speak=message=>{const before=beeps;get('speak').fire('click');assert.equal
  get('speak').fire('click');get('stop').fire('click');assert.equal(activeCapture,false);
  get('fallback-request').value='Play Even Though I’m Blind Experience';get('fallback-form').fire('submit',{preventDefault(){}});await new Promise(setImmediate);assert.equal(get('audio').lastPlayed,experience.media);assert.equal(get('fallback-request').value,'');
  get('speak').fire('click');windowEvents.pagehide();assert.equal(activeCapture,false);assert.equal(get('speak').textContent,'Speak now');
+ get('fallback-request').value='Play Even Though I’m Blind Experience';get('fallback-form').fire('submit',{preventDefault(){}});await new Promise(setImmediate);get('audio').currentTime=27;
+ windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:initialize'}});
+ windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:minimize'}});assert.equal(get('audio').paused,false,'Minimize must leave audio playing');assert.equal(get('audio').currentTime,27);
+ windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:command',command:'pause'}});assert.equal(get('audio').paused,true);
+ windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:command',command:'resume'}});await new Promise(setImmediate);assert.equal(get('audio').paused,false);assert.equal(get('audio').currentTime,27);
+ windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:stop'}});assert.equal(get('audio').paused,true);assert.equal(get('audio').getAttribute('src'),null);assert.match(parentMessages.at(-1).data.text,/Stopped/);
  console.log('PASS: managed SDK callback-to-player integration, repeated commands, microphone/media separation, pause/resume position, full podcasts, Seen requests, controls during capture and dictation form.');
 })().catch(e=>{console.error(e);process.exitCode=1});

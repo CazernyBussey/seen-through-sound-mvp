@@ -54,9 +54,9 @@ $('read-answer').addEventListener('click',()=>read($('answer').textContent,true)
 if('speechSynthesis'in window)window.speechSynthesis.getVoices();
 else{$('read-aloud').disabled=true;$('read-answer').disabled=true;$('silence').hidden=true;}
 const allowedParents=new Set([location.origin,'https://eventhoughimblind.com','https://eventhoughimblind.wordpress.com']);
-window.addEventListener('message',e=>{if(!allowedParents.has(e.origin)||e.source!==window.parent)return;if(e.data?.type==='etib:initialize'){embedded=true;parentOrigin=e.origin;$('close').hidden=false;requestInput.focus()}if(e.data?.type==='etib:stop'){stop();silence();voiceInput?.abort()}if(e.data?.type==='etib:minimize'){voiceInput?.abort()}if(e.data?.type==='etib:command'){if(e.data.command==='pause')pause();if(e.data.command==='resume')void play();if(e.data.command==='stop')stop();}});
+window.addEventListener('message',e=>{if(!allowedParents.has(e.origin)||e.source!==window.parent)return;if(e.data?.type==='etib:initialize'){embedded=true;parentOrigin=e.origin;$('close').hidden=false;requestInput.focus()}if(e.data?.type==='etib:stop'){controller?.abort();stop();silence();voiceInput?.abort();notifyWidget()}if(e.data?.type==='etib:minimize'){voiceInput?.abort()}if(e.data?.type==='etib:command'){if(e.data.command==='pause')pause();if(e.data.command==='resume')void play();if(e.data.command==='stop'){stop();notifyWidget();}}});
 let parentOrigin=location.origin;
-$('close').addEventListener('click',()=>{stop();silence();window.parent.postMessage({type:'etib:close'},parentOrigin)});
+$('close').addEventListener('click',()=>{controller?.abort();stop();silence();window.parent.postMessage({type:'etib:close'},parentOrigin)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&embedded){e.preventDefault();$('close').click()}});
 if(window.parent!==window)window.parent.postMessage({type:'etib:ready'},'*');
 function releaseVoice(){voiceInput?.abort();if(isCue())$('audio').pause();}
@@ -74,5 +74,5 @@ function spotify(item){
 
 $('fallback-form').addEventListener('submit',event=>{event.preventDefault();const input=$('fallback-request');const message=input.value.trim();if(!message||busy)return;voiceInput?.abort();silence();send(message);input.value='';});
 
-function notifyWidget(){if(!embedded)return;window.parent.postMessage({type:'etib:playback',text:$('media-status').textContent||'Ready.',playing:!!selected&&!$('audio').paused&&!$('audio').ended,selected:!!selected},parentOrigin);}
+function notifyWidget(){if(!embedded)return;window.parent.postMessage({type:'etib:playback',text:selected?$('media-status').textContent||'Ready.':'Ready.',playing:!!selected&&!$('audio').paused&&!$('audio').ended,selected:!!selected},parentOrigin);}
 ['playing','pause','ended','error','emptied'].forEach(event=>$('audio').addEventListener(event,notifyWidget));

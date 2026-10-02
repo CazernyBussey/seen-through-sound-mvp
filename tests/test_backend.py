@@ -28,6 +28,9 @@ server.CACHE['seen']['items']=seen
 for q,a in [('Pause' ,'pause'),('Resume','resume'),('Stop','stop')]:assert check(q)['action']['type']==a
 r=check('Play the latest ETIB Experience episode');assert r['action']['type']=='play' and not r['results'][0]['preview']
 r=check('Play the latest ETIB Radio Podcast episode');assert r['action']['type']=='spotify' and r['action']['item']['preview']
+radio=server.CACHE['radio_podcast']['items'];server.CACHE['radio_podcast']['items']=[dict(radio[0],media=''),*radio[1:]]
+assert check('Play Even Though I’m Blind Radio Podcast')['action']['type']=='spotify'
+server.CACHE['radio_podcast']['items']=radio
 r=check('Play the latest episode');assert r['action'] is None and 'Which podcast' in r['text']
 r=check('Find the episode with Angela Harris',{'podcast':'experience'});assert 'Angela' in r['results'][0]['title']
 r=check('Find an old article about accessibility');assert r['results']

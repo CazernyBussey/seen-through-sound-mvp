@@ -1,40 +1,66 @@
 'use strict';
-// One request per microphone activation. Dispatch only after capture ends, so
-// replies or media cannot be captured as a second command.
-function createVoiceInput({Speech, button, feedback, onRequest, onBeforeListen, onUnavailable, onListening}) {
- let recognition=null, active=false, starting=false, busy=false, transcript='', failed=false, canceled=false;
- let idleLabel='Speak now', silenceTimer=null, limitTimer=null, endTimer=null, finished=true;
- function clearTimers(){clearTimeout(silenceTimer);clearTimeout(limitTimer);clearTimeout(endTimer);}
- function finish(){if(finished)return;finished=true;clearTimers();const request=transcript.trim();transcript='';reset();if(!canceled&&!failed&&request){feedback('Opening…');onRequest(request);}else if(!canceled&&!failed)feedback('No request was heard. Select Speak now and try again.');}
- function stopCapture(){if(finished)return;clearTimeout(silenceTimer);try{recognition.stop()}catch{}if(finished)return;clearTimeout(endTimer);endTimer=setTimeout(()=>{if(finished)return;try{recognition.abort()}catch{}finish();},800);}
- if(Speech){try{recognition=new Speech();idleLabel='Speak now';}catch{recognition=null;}}
- // Let Safari choose recording and playback routing without forcing a session type.
- function audioMode(type){try{if(typeof navigator!=='undefined'&&navigator.audioSession)navigator.audioSession.type=type;}catch{}}
- function reset(){audioMode('auto');active=false;starting=false;button.textContent=idleLabel;button.setAttribute('aria-pressed','false');button.disabled=busy;}
- function abort(){finished=true;clearTimers();canceled=true;transcript='';if(active||starting){try{recognition.abort()}catch{} }reset();}
- function setBusy(value){busy=value;button.disabled=value;}
- if(recognition){
-  recognition.lang='en-US';recognition.interimResults=true;recognition.continuous=false;
-  recognition.onstart=()=>{if(finished)return;starting=false;active=true;button.textContent='Stop listening';button.setAttribute('aria-pressed','true');feedback('Listening…');try{onListening?.();}catch{}};
-  recognition.onresult=event=>{if(finished||canceled)return;transcript=Array.from(event.results,result=>result[0]?.transcript||'').join(' ').trim();if(!transcript)return;clearTimeout(silenceTimer);if(Array.from(event.results).some(result=>result.isFinal===true))stopCapture();else silenceTimer=setTimeout(stopCapture,1100);};
-  recognition.onerror=event=>{if(finished)return;if(canceled&&event.error==='aborted')return;if(transcript.trim()&&['no-speech','aborted'].includes(event.error)){finish();return;}failed=true;const messages={
-   'not-allowed':'Microphone access was not allowed. Open this site in Safari or Chrome and allow its microphone. Select Help and options for another voice assistant.',
-   'service-not-allowed':'This browser cannot start its speech service. On iPhone, open the site in Safari and check that Siri or Dictation is enabled. Select Help and options for another voice assistant.',
-   'audio-capture':'No microphone was available. Check that your device has an enabled microphone, or open the voice assistant in Help and options.',
-   'network':'The browser speech service could not connect. Try again, or open the voice assistant in Help and options.',
-   'no-speech':'No speech was heard. Select Speak now and try again.',
-   'aborted':'Listening stopped. Select Speak now to try again.'};feedback(messages[event.error]||'Speech recognition could not complete. Try again, or open the voice assistant in Help and options.');finish();};
-  recognition.onend=finish;
+// A fresh recognizer for every request. No shared audio-session settings.
+function createVoiceInput({Speech,button,feedback,onRequest,onBeforeListen,onUnavailable,onListening}) {
+ let current=null,busy=false,serial=0;
+ function reset(){button.textContent='Speak now';button.setAttribute('aria-pressed','false');button.disabled=busy;}
+ function clear(attempt){for(const id of attempt.timers.values())clearTimeout(id);attempt.timers.clear();}
+ function later(attempt,key,fn,delay){clearTimeout(attempt.timers.get(key));attempt.timers.set(key,setTimeout(()=>{attempt.timers.delete(key);if(current===attempt)fn();},delay));}
+ function detach(attempt){const r=attempt.recognition;r.onstart=r.onresult=r.onspeechend=r.onsoundend=r.onaudioend=r.onend=r.onerror=null;}
+ function finish(attempt,submit=true){
+  if(current!==attempt)return;
+  clear(attempt);detach(attempt);current=null;
+  try{if(!attempt.ended)attempt.recognition.abort();}catch{}
+  reset();
+  const text=attempt.transcript.trim();
+  if(submit&&text){feedback('Opening…');onRequest(text);}
+  else if(submit)feedback('No speech received. Try Speak now, or choose a suggestion.');
  }
- button.textContent=idleLabel;
- button.addEventListener('click',()=>{
+ function stopCapture(attempt){
+  if(current!==attempt||attempt.stopping)return;
+  attempt.stopping=true;clear(attempt);button.textContent='Finishing request';feedback('Finishing…');
+  // Set recovery before stop(): Safari may fire end synchronously or omit it.
+  later(attempt,'release',()=>finish(attempt),500);
+  try{attempt.recognition.stop();}catch{finish(attempt);}
+ }
+ function abort(){if(current)finish(current,false);else reset();}
+ function setBusy(value){busy=value;button.disabled=value;if(!current)reset();}
+ function start(){
   if(busy)return;
-  if(active||starting){abort();feedback('Listening stopped.');return;}
-  if(!recognition){feedback('This browser does not support microphone requests here. Open the site in Safari or Chrome, or open the voice assistant in Help and options.');onUnavailable();return;}
-  clearTimers();finished=false;transcript='';failed=false;canceled=false;starting=true;button.textContent='Cancel listening';button.setAttribute('aria-pressed','true');onBeforeListen();feedback('Starting microphone…');
-  try{audioMode('auto');recognition.start();if(!finished)limitTimer=setTimeout(stopCapture,20000);}catch{finished=true;clearTimers();reset();failed=true;feedback('The microphone could not start. Open this site in Safari or Chrome, or open the voice assistant in Help and options.');}
- });
- return {abort,setBusy,isListening:()=>active};
+  if(current){stopCapture(current);return;}
+  if(!Speech){feedback('Microphone requests need Safari or Chrome. Choose a suggestion or open the voice assistant in Help and options.');onUnavailable?.();return;}
+  let recognition;
+  try{recognition=new Speech();}catch{feedback('Microphone unavailable. Choose a suggestion or open Help and options.');reset();return;}
+  const attempt={id:++serial,recognition,transcript:'',stopping:false,ended:false,timers:new Map()};current=attempt;
+  recognition.lang='en-US';recognition.interimResults=true;recognition.continuous=false;recognition.maxAlternatives=1;
+  recognition.onstart=()=>{if(current!==attempt)return;clearTimeout(attempt.timers.get('startup'));button.textContent='Done speaking';button.setAttribute('aria-pressed','true');feedback('Listening. Say your request.');try{onListening?.();}catch{}later(attempt,'limit',()=>stopCapture(attempt),8000);};
+  recognition.onresult=event=>{
+   if(current!==attempt)return;
+   const results=Array.from(event.results);const text=results.map(r=>r[0]?.transcript||'').join(' ').trim();
+   const changed=text!==attempt.transcript;if(text)attempt.transcript=text;
+   if(results.some(r=>r.isFinal===true)){stopCapture(attempt);return;}
+   // Repeated identical interim events must not postpone the trigger forever.
+   if(text&&changed&&!attempt.stopping)later(attempt,'silence',()=>stopCapture(attempt),650);
+  };
+  recognition.onspeechend=()=>stopCapture(attempt);
+  recognition.onsoundend=()=>{if(attempt.transcript)stopCapture(attempt);};
+  recognition.onaudioend=()=>{attempt.ended=true;if(attempt.stopping&&attempt.transcript)finish(attempt);};
+  recognition.onend=()=>{attempt.ended=true;finish(attempt);};
+  recognition.onerror=event=>{
+   if(current!==attempt)return;
+   if(attempt.transcript&&['no-speech','aborted'].includes(event.error)){finish(attempt);return;}
+   const messages={
+    'not-allowed':'Microphone blocked. Open in Safari and allow microphone access. Suggestions work without it.',
+    'service-not-allowed':'Speech service unavailable. In Safari, check Siri or Dictation. Suggestions work without the microphone.',
+    'audio-capture':'Microphone unavailable. Choose a suggestion or open Help and options.',
+    'network':'Speech service could not connect. Try again or choose a suggestion.',
+    'no-speech':'No speech received. Try Speak now, or choose a suggestion.',
+    'aborted':'Listening stopped. Speak now is ready.'};
+   finish(attempt,false);feedback(messages[event.error]||'Voice unavailable. Try again or choose a suggestion.');
+  };
+  button.textContent='Done speaking';button.setAttribute('aria-pressed','true');feedback('Starting microphone…');
+  later(attempt,'startup',()=>{finish(attempt,false);feedback('Microphone did not start. Choose a suggestion or open Help and options.');},10000);
+  try{onBeforeListen?.();recognition.start();}catch{finish(attempt,false);feedback('Microphone could not start. Choose a suggestion or open Help and options.');}
+ }
+ button.addEventListener('click',start);reset();
+ return {abort,setBusy,isListening:()=>!!current&&!current.stopping};
 }
-
-

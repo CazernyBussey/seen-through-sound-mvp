@@ -1,38 +1,25 @@
-const assert=require('node:assert/strict');
-const fs=require('node:fs');
-const vm=require('node:vm');
-const modes=[];let timerId=0;const timers=new Map();
-function setTimeout(fn,delay){const id=++timerId;timers.set(id,{fn,delay});return id;}
-function clearTimeout(id){timers.delete(id);}
-function tick(delay){for(const [id,timer] of [...timers])if(timer.delay===delay){timers.delete(id);timer.fn();}}
-const context=vm.createContext({setTimeout,clearTimeout,navigator:{audioSession:{set type(value){modes.push(value)},get type(){return modes.at(-1)}}}});
-vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../voice.js'),'utf8'),context);
-function setup(supported=true){
- let handler, recognition;
- class Speech {constructor(){recognition=this;}start(){this.starts=(this.starts||0)+1;}abort(){this.aborts=(this.aborts||0)+1;}}
- const button={textContent:'',disabled:false,attributes:{},setAttribute(k,v){this.attributes[k]=v;},addEventListener(type,fn){handler=fn;}};
- const requests=[],feedback=[],cues=[];
- const controller=context.createVoiceInput({Speech:supported?Speech:null,button,feedback:text=>feedback.push(text),onRequest:text=>{requests.push(text)},onBeforeListen:()=>{},onUnavailable:()=>{},onListening:()=>cues.push('ready')});
- return {button,controller,requests,feedback,cues,click:()=>handler(),get recognition(){return recognition;}};
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+function setup(options={}){
+ let handler,nextTimer=0;
+ const timers=new Map(),recognizers=[],requests=[],feedback=[];
+ const context=vm.createContext({setTimeout(fn,ms){const id=++nextTimer;timers.set(id,{fn,ms});return id},clearTimeout(id){timers.delete(id)},navigator:{get audioSession(){throw Error('Must not change audio routing')}}});
+ vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../voice.js'),'utf8'),context);
+ class Speech{constructor(){if(options.constructorError)throw Error('unavailable');recognizers.push(this)}start(){if(options.startError)throw Error('start failed')}stop(){this.stops=(this.stops||0)+1;if(options.syncEnd)this.onend?.()}abort(){this.aborts=(this.aborts||0)+1;this.onend?.()}}
+ const button={setAttribute(k,v){this[k]=v},addEventListener(type,fn){handler=fn}};
+ const controller=context.createVoiceInput({Speech:options.unsupported?null:Speech,button,feedback:t=>feedback.push(t),onRequest:t=>requests.push(t),onBeforeListen(){},onUnavailable(){}});
+ return {button,controller,requests,feedback,recognizers,timers,click:()=>handler(),tick(ms){for(const [id,t] of [...timers])if(t.ms===ms){timers.delete(id);t.fn()}},get r(){return recognizers.at(-1)}};
 }
-let v=setup();v.click();assert.equal(modes.at(-1),'auto');assert.equal(v.cues.length,0,'No ready cue before capture starts');v.recognition.onstart();assert.equal(v.cues.length,1);assert.equal(v.controller.isListening(),true);
-v.recognition.onresult({resultIndex:0,results:[Object.assign([{transcript:'Play ETIB Radio'}],{isFinal:true})]});
-assert.deepEqual(v.requests,[],'Do not run actions while microphone is still capturing');
-v.recognition.onend();assert.equal(modes.at(-1),'auto');assert.deepEqual(v.requests,['Play ETIB Radio']);assert.equal(v.button.attributes['aria-pressed'],'false');
-v.controller.setBusy(true);v.click();assert.equal(v.recognition.starts,1,'Do not silently lose a new request while an answer is pending');v.controller.setBusy(false);
-v.click();v.recognition.onstart();v.recognition.onresult({results:[[{transcript:'Take me to ETIB Facebook'}]]});v.click();v.recognition.onend();assert.equal(v.requests.length,1,'Cancel must not execute a partially captured command');
-for(const error of ['not-allowed','audio-capture','network','no-speech']){v=setup();v.click();v.recognition.onerror({error});v.recognition.onend();assert.equal(v.requests.length,0);assert.match(v.feedback.at(-1),/microphone|speech|dictation/i);assert.equal(v.button.textContent,'Speak now');}
-v=setup();v.click();v.recognition.onstart();v.recognition.onend();assert.match(v.feedback.at(-1),/No request was heard/);
-v=setup(false);v.click();assert.match(v.feedback.at(-1),/voice assistant in Help and options/);
-v=setup();v.click();v.controller.abort();assert.equal(modes.at(-1),'auto','Cancellation restores media routing');
-v=setup();v.recognition.start=()=>{throw Error('unavailable')};v.click();assert.equal(modes.at(-1),'auto','Failed startup restores media routing');
-console.log('Voice input tests passed: capture completion, command dispatch, cancellation, pending requests, denied/unavailable microphone, no speech, unsupported browser.');
-
-const unavailableButton={setAttribute(){},addEventListener(type,fn){this.click=fn}};const messages=[];context.createVoiceInput({Speech:class{constructor(){throw new Error('unavailable')}},button:unavailableButton,feedback:t=>messages.push(t),onUnavailable(){},onBeforeListen(){},onRequest(){throw Error('must not submit')}});unavailableButton.click();assert.match(messages[0],/does not support/);
-
-
-// Safari may provide only interim text or omit the end event after stop.
-v=setup();v.click();v.recognition.onstart();v.recognition.onresult({results:[Object.assign([{transcript:'play radio'}],{isFinal:false})]});tick(1100);assert.equal(v.requests.length,0);tick(800);assert.deepEqual(v.requests,['play radio']);assert.equal(v.controller.isListening(),false);v.recognition.onend();assert.equal(v.requests.length,1,'Late end must not duplicate a command');
-v=setup();v.click();v.recognition.onstart();tick(20000);tick(800);assert.equal(v.button.textContent,'Speak now');assert.equal(v.requests.length,0);
-v=setup();v.click();v.recognition.onstart();v.recognition.onresult({results:[Object.assign([{transcript:'play'}],{isFinal:false})]});v.recognition.onresult({results:[Object.assign([{transcript:'play radio'}],{isFinal:false})]});tick(1100);tick(800);assert.deepEqual(v.requests,['play radio'],'Interim revisions replace prior text');
-console.log('Safari recovery checks passed: interim-only speech, missing end event, bounded listening, no duplicate dispatch.');
+const result=(text,final=false)=>({results:[Object.assign([{transcript:text}],{isFinal:final})]});
+let v=setup();v.click();v.r.onstart();v.r.onresult(result('Play ETIB Radio',true));assert.equal(v.r.stops,1);assert.equal(v.requests.length,0);v.r.onaudioend();assert.deepEqual(v.requests,['Play ETIB Radio']);assert.equal(v.button.textContent,'Speak now');assert.equal(v.timers.size,0);
+v=setup();v.click();v.r.onstart();v.r.onresult(result('play'));v.r.onresult(result('play the latest Experience podcast'));v.tick(650);assert.equal(v.r.stops,1);v.tick(500);assert.deepEqual(v.requests,['play the latest Experience podcast']);assert.equal(v.r.aborts,1,'Missing end recovery must release capture');
+v=setup();v.click();v.r.onstart();v.r.onresult(result('play radio'));const timer=[...v.timers].find(([,t])=>t.ms===650)[0];v.r.onresult(result('play radio'));assert.ok(v.timers.has(timer),'Identical interim text must not keep extending listening');v.tick(650);v.tick(500);assert.equal(v.requests.length,1);
+v=setup();v.click();v.r.onstart();v.r.onresult(result('Play Seen Through Sound'));v.click();assert.equal(v.r.stops,1,'Done speaking submits instead of cancels');v.r.onend();assert.deepEqual(v.requests,['Play Seen Through Sound']);
+v=setup();v.click();v.r.onstart();v.r.onspeechend();v.r.onresult(result('Take me to ETIB Facebook',true));v.r.onend();assert.deepEqual(v.requests,['Take me to ETIB Facebook'],'A final result arriving after speechend must still be used');
+v=setup();v.click();v.r.onstart();v.tick(8000);v.tick(500);assert.equal(v.controller.isListening(),false);assert.equal(v.button.textContent,'Speak now');assert.match(v.feedback.at(-1),/No speech received/);
+v=setup();v.click();v.tick(10000);assert.equal(v.button.textContent,'Speak now');assert.equal(v.requests.length,0);
+v=setup();v.click();v.r.onstart();const lateEnd=v.r.onend,lateError=v.r.onerror;v.controller.abort();v.click();assert.equal(v.recognizers.length,2,'Use a fresh recognizer after reset');v.r.onstart();lateEnd();lateError({error:'no-speech'});assert.equal(v.controller.isListening(),true,'Stale events must not finish a newer capture');v.r.onresult(result('play radio',true));v.tick(500);assert.deepEqual(v.requests,['play radio']);
+v=setup({syncEnd:true});v.click();v.r.onstart();v.r.onresult(result('pause',true));assert.deepEqual(v.requests,['pause']);assert.equal(v.timers.size,0,'Synchronous end must not leave a recovery timer');
+for(const error of ['not-allowed','service-not-allowed','audio-capture','network','no-speech']){v=setup();v.click();v.r.onerror({error});assert.equal(v.button.textContent,'Speak now');assert.equal(v.requests.length,0);assert.match(v.feedback.at(-1),/Microphone|Speech|speech|voice/i);}
+for(const options of [{unsupported:true},{constructorError:true},{startError:true}]){v=setup(options);v.click();assert.equal(v.button.textContent,'Speak now');assert.equal(v.requests.length,0);assert.match(v.feedback.at(-1),/suggestion/i);}
+v=setup();v.controller.setBusy(true);v.click();assert.equal(v.recognizers.length,0);v.controller.setBusy(false);v.click();v.r.onresult(result('play radio'));v.controller.abort();assert.equal(v.requests.length,0,'Cancel must discard captured text');
+console.log('PASS: final/interim triggers, identical interim events, manual Done speaking, late final results, 8-second cap, startup timeout, missing/synchronous end, stale events, cancellation and microphone failures.');

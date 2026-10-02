@@ -170,7 +170,7 @@ def reply(message,session=None):
     if dest and dest['id']=='radio' and (play or 'radio' in q) and 'podcast' not in q:
         out['session'].update(last_id='radio',playing_id='radio');item=dict(dest,title=dest['name'],media=dest['media'],preview=False)
         return answer('ETIB Radio is ready. If your browser needs permission, activate Play selected audio.',[item],{'type':'play','item':cards([item])[0]} if play else None)
-    episode=bool(re.search(r'\b(episode|podcast)\b',q))
+    episode=bool(re.search(r'\b(episode|podcast)\b',q)) or bool(play and dest and dest['id'] in ['experience','radio_podcast'])
     if episode:
         kind='radio_podcast' if ('radio' in q or dest and dest['id']=='radio_podcast') else 'experience' if 'experience' in q else out['session'].get('podcast')
         if not kind:
@@ -216,10 +216,10 @@ class Handler(BaseHTTPRequestHandler):
         path=urlparse(self.path).path
         if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','paid_services':False}).encode())
         if path=='/api/registry':return self.send(200,json.dumps(REGISTRY).encode())
-        mapping={'/':'index.html','/index.html':'index.html','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
+        mapping={'/':'index.html','/index.html':'index.html','/listening-cue.wav':'listening-cue.wav','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
         f=mapping.get(path)
         if not f:return self.send(404,b'{"error":"Not found"}')
-        kind='audio/mpeg' if f.endswith('mp3') else 'text/html; charset=utf-8' if f.endswith('html') else 'text/javascript; charset=utf-8' if f.endswith('js') else 'text/css; charset=utf-8'
+        kind='audio/wav' if f.endswith('wav') else 'audio/mpeg' if f.endswith('mp3') else 'text/html; charset=utf-8' if f.endswith('html') else 'text/javascript; charset=utf-8' if f.endswith('js') else 'text/css; charset=utf-8'
         self.send(200,(ROOT/f).read_bytes(),kind)
     def do_POST(self):
         if self.path!='/api/chat':return self.send(404,b'{"error":"Not found"}')

@@ -1,8 +1,11 @@
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
-const modes=[];
-const context=vm.createContext({navigator:{audioSession:{set type(value){modes.push(value)},get type(){return modes.at(-1)}}}});
+const modes=[];let timerId=0;const timers=new Map();
+function setTimeout(fn,delay){const id=++timerId;timers.set(id,{fn,delay});return id;}
+function clearTimeout(id){timers.delete(id);}
+function tick(delay){for(const [id,timer] of [...timers])if(timer.delay===delay){timers.delete(id);timer.fn();}}
+const context=vm.createContext({setTimeout,clearTimeout,navigator:{audioSession:{set type(value){modes.push(value)},get type(){return modes.at(-1)}}}});
 vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../voice.js'),'utf8'),context);
 function setup(supported=true){
  let handler, recognition;
@@ -26,3 +29,10 @@ v=setup();v.recognition.start=()=>{throw Error('unavailable')};v.click();assert.
 console.log('Voice input tests passed: capture completion, command dispatch, cancellation, pending requests, denied/unavailable microphone, no speech, unsupported browser.');
 
 const unavailableButton={setAttribute(){},addEventListener(type,fn){this.click=fn}};const messages=[];context.createVoiceInput({Speech:class{constructor(){throw new Error('unavailable')}},button:unavailableButton,feedback:t=>messages.push(t),onUnavailable(){},onBeforeListen(){},onRequest(){throw Error('must not submit')}});unavailableButton.click();assert.match(messages[0],/does not support/);
+
+
+// Safari may provide only interim text or omit the end event after stop.
+v=setup();v.click();v.recognition.onstart();v.recognition.onresult({results:[Object.assign([{transcript:'play radio'}],{isFinal:false})]});tick(1100);assert.equal(v.requests.length,0);tick(800);assert.deepEqual(v.requests,['play radio']);assert.equal(v.controller.isListening(),false);v.recognition.onend();assert.equal(v.requests.length,1,'Late end must not duplicate a command');
+v=setup();v.click();v.recognition.onstart();tick(20000);tick(800);assert.equal(v.button.textContent,'Speak now');assert.equal(v.requests.length,0);
+v=setup();v.click();v.recognition.onstart();v.recognition.onresult({results:[Object.assign([{transcript:'play'}],{isFinal:false})]});v.recognition.onresult({results:[Object.assign([{transcript:'play radio'}],{isFinal:false})]});tick(1100);tick(800);assert.deepEqual(v.requests,['play radio'],'Interim revisions replace prior text');
+console.log('Safari recovery checks passed: interim-only speech, missing end event, bounded listening, no duplicate dispatch.');

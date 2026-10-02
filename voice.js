@@ -43,7 +43,7 @@ function createVoiceInput({Speech,button,feedback,onRequest,onBeforeListen,onUna
   };
   recognition.onspeechend=()=>stopCapture(attempt);
   recognition.onsoundend=()=>{if(attempt.transcript)stopCapture(attempt);};
-  recognition.onaudioend=()=>{attempt.ended=true;if(attempt.stopping&&attempt.transcript)finish(attempt);};
+  recognition.onaudioend=()=>{if(attempt.stopping&&attempt.transcript)finish(attempt);};
   recognition.onend=()=>{attempt.ended=true;finish(attempt);};
   recognition.onerror=event=>{
    if(current!==attempt)return;

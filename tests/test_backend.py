@@ -9,7 +9,9 @@ r=check('Take me to ETIB Facebook');assert r['action']['url'].startswith('https:
 r=check('Show ETIB Facebook');assert r['action'] is None and len(r['results'])==1
 r=check('Take me to Cazerny Instagram');assert 'cazernybussey' in r['action']['url']
 r=check('Play ETIB Radio');assert r['action']['item']['media']=='https://stream.zeno.fm/qvlhys2h2odvv'
-for q,a in [('Pause','pause'),('Resume','resume'),('Stop','stop')]:assert check(q)['action']['type']==a
+for q in ["Play Even Though I'm Blind Radio","Play Even Though I’m Blind Radio","Listen to Even Though I'm Blind Experience Podcast","Play Even Though I'm Blind Experience","Play the newest Even Though I'm Blind Radio Podcast"]:
+ assert check(q)['action']['type'] in ['play','spotify']
+for q,a in [('Pause' ,'pause'),('Resume','resume'),('Stop','stop')]:assert check(q)['action']['type']==a
 r=check('Play the latest ETIB Experience episode');assert r['action']['type']=='play' and not r['results'][0]['preview']
 r=check('Play the latest ETIB Radio Podcast episode');assert r['action']['type']=='spotify' and r['action']['item']['preview']
 r=check('Play the latest episode');assert r['action'] is None and 'Which podcast' in r['text']

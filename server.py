@@ -19,7 +19,7 @@ SPOTIFY='https://open.spotify.com/show/6302Iby2KZMf4MWYq2sr16'
 def clean(s):
     return html.unescape(re.sub(r'\s+',' ',re.sub(r'<[^>]*>',' ',re.sub(r'<(?:script|style)\b[^>]*>.*?</(?:script|style)>','',s or '',flags=re.S)))).strip()
 def norm(s):
-    return re.sub(r'[^a-z0-9 ]',' ',unicodedata.normalize('NFKD',s.lower()).encode('ascii','ignore').decode()).strip()
+    return re.sub(r'\s+',' ',re.sub(r'[^a-z0-9 ]',' ',unicodedata.normalize('NFKD',s.lower().replace('’',"'")).encode('ascii','ignore').decode())).strip()
 def safe_url(s,media=False):
     try:
         u=urlparse(s);h=u.hostname or ''

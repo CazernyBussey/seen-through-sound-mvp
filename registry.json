@@ -40,6 +40,8 @@
     "id": "radio",
     "name": "ETIB Radio",
     "aliases": [
+      "even though im blind radio",
+      "even though i'm blind radio",
       "radio station",
       "etib radio",
       "station",
@@ -59,6 +61,8 @@
     "id": "radio_podcast",
     "name": "ETIB Radio Podcast",
     "aliases": [
+      "even though im blind radio podcast",
+      "even though i'm blind radio podcast",
       "etib radio podcast",
       "radio podcast"
     ],
@@ -75,6 +79,8 @@
     "id": "experience",
     "name": "ETIB Experience Podcast",
     "aliases": [
+      "even though im blind experience",
+      "even though i'm blind experience",
       "experience podcast",
       "etib experience",
       "experience"

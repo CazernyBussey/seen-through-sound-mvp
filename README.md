@@ -87,3 +87,10 @@ Radio Podcast full-episode update: Radio Podcast play requests now open the offi
 Radio Podcast RSS distribution was enabled in Spotify for Creators. Its public feed is https://anchor.fm/s/11630f9b4/podcast/rss. This supersedes the earlier Radio preview and Spotify-redirect behavior: Radio Podcast requests now load the newest full RSS enclosure in the same native audio player as Experience. Play it, Play, Pause, Resume and Stop stay on the page. Generic Play episode defaults to Radio Podcast without a podcast context, while Experience context remains Experience. Feed refresh uses the existing five-minute cache and dated saved full-audio snapshot during source failure. No Radio preview is used as a full-audio fallback. Explicit Spotify navigation remains available when requested.
 
 The main screen still has exactly two suggestions. Physical iPhone microphone and VoiceOver playback remain unverified; backend and player regression checks cover the changed routing, full enclosures and playback controls.
+
+
+## Continuous Seen Through Sound playback, October 2, 2026
+
+Play Seen Through Sound now queues the playable published messages returned by the existing public source, newest first (up to its existing 100-message limit). The same native audio player advances automatically when a message ends, skips a failed message when another is available, and finishes after the last message without looping. Pause/Resume preserve the queue; Stop or selecting other audio clears it. The microphone listening cue does not advance the playlist. The main page retains two suggestions. Source permissions, publishing status and the original Seen Through Sound website are unchanged.
+
+Regression checks cover queue filtering, automatic advancement, microphone cue isolation, pause/resume, failed-message handling, Stop, switching sources and final completion. Actual iPhone automatic playback remains a device-test limitation.

@@ -69,3 +69,17 @@ parsed=server.load_radio_podcast()
 assert parsed[0]['title']=='Newest' and parsed[0]['media']=='https://d3ctxlq1ktw2nl.cloudfront.net/new.m4a' and not parsed[0]['preview']
 server.fetch=original_fetch
 print('PASS: Radio RSS full enclosures, date ordering, native playback, and missing-audio handling.')
+
+# Queue only playable published messages, retaining source order and one result card.
+seen_before=server.CACHE['seen']['items']
+a=seen_before[0]
+b=dict(a,id='seen-second',title='Second message')
+c=dict(a,id='seen-missing',media='')
+d=dict(a,id='seen-unsafe',media='https://evil.example/audio.mp3')
+server.CACHE['seen']['items']=[a,c,d,b]
+queued=check('Play Seen Through Sound')
+assert queued['action']['item']['id']==a['id']
+assert [x['id'] for x in queued['action']['queue']]==['seen-second']
+assert len(queued['results'])==1
+server.CACHE['seen']['items']=seen_before
+print('PASS: Seen Through Sound queue filters missing and unsafe media and preserves published source order.')

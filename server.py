@@ -227,9 +227,9 @@ def reply(message,session=None):
         return answer(txt,found,{'type':'spotify' if item.get('preview') else 'play','item':cards([item])[0]} if play and (item.get('media') or item.get('preview')) else None)
     if dest and dest['id']=='seen':
         if play or not re.search(r'\b(show|find|search|what|about|describe|tell)\b',q):
-            s=source('seen');found=[x for x in s['items'] if x.get('media') and safe_url(x['media'],True)][:1]
+            s=source('seen');found=[x for x in s['items'] if x.get('media') and safe_url(x['media'],True)]
             if found and found[0].get('media'):
-                out['session'].update(last_id=found[0]['id'],playing_id=found[0]['id']);return answer('Encouragement selected. '+freshness(s),found,{'type':'play','item':cards(found)[0]})
+                out['session'].update(last_id=found[0]['id'],playing_id=found[0]['id']);return answer('Seen Through Sound will play '+str(len(found))+' published message'+('s' if len(found)!=1 else '')+' in order. '+freshness(s),found[:1],{'type':'play','item':cards(found[:1])[0],'queue':cards(found[1:])})
             return answer('Open the official Seen Through Sound playlist to listen. '+freshness(s),[dict(dest,title=dest['name'])])
         return answer(dest['description'],[dict(dest,title=dest['name'])])
     if re.search(r'\b(events|event|calendar|upcoming)\b',q):

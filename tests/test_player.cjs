@@ -11,8 +11,9 @@ const get=id=>{if(!nodes.has(id))nodes.set(id,new Element(id));return nodes.get(
 const doc={getElementById:get,querySelectorAll:()=>[],createElement:()=>new Element('created'),addEventListener(){},activeElement:null};
 const experience={id:'experience-latest',category:'experience',title:'Newest Experience',media:'https://d3ctxlq1ktw2nl.cloudfront.net/full.mp3',preview_media:'https://p.scdn.co/preview.mp3',spotify_url:'https://open.spotify.com/show/2ejjSEAbngiJDrvqiN6vR6',preview:false};
 const radio={id:'radio-latest',category:'radio_podcast',title:'Newest Radio Podcast',media:'https://d3ctxlq1ktw2nl.cloudfront.net/radio-full.m4a',url:'https://open.spotify.com/episode/abc',preview:false};
+const seen=[1,2,3].map(i=>({id:'seen-'+i,category:'seen',title:'Message '+i,url:'https://cazernybussey.github.io/seen-through-sound-mvp/playlist.html',media:'https://wrczpnhesorptjzwdizd.supabase.co/storage/v1/object/public/audio/message-'+i+'.mp3',preview:false}));
 const win={addEventListener(){},parent:null};win.parent=win;
-const ctx=vm.createContext({document:doc,window:win,URL,location:{origin:'https://test.example',href:'https://test.example',assign(url){this.destination=url}},AbortController,setTimeout:()=>1,clearTimeout(){},createVoiceInput(o){voice=o;return{abort(){},setBusy(){}}},fetch:async url=>({ok:true,json:async()=>url==='/api/audio'?{experience,radio_podcast:radio}:url==='/api/registry'?[]:(backendCalls++,{text:'',session:{},action:null})})});
+const ctx=vm.createContext({document:doc,window:win,URL,location:{origin:'https://test.example',href:'https://test.example',assign(url){this.destination=url}},AbortController,setTimeout:()=>1,clearTimeout(){},createVoiceInput(o){voice=o;return{abort(){},setBusy(){}}},fetch:async (url,options)=>({ok:true,json:async()=>url==='/api/audio'?{experience,radio_podcast:radio}:url==='/api/registry'?[]:(backendCalls++,JSON.parse(options.body).message.includes('Seen Through Sound')?{text:'',session:{},action:{type:'play',item:seen[0],queue:[seen[1],{...seen[1],id:'unsafe',media:'https://evil.example/no.mp3'},seen[2]]}}:{text:'',session:{},action:null})})});
 vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../app.js'),'utf8'),ctx);
 (async()=>{
  await new Promise(setImmediate);
@@ -25,5 +26,14 @@ vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../app.js')
  await ctx.send('Pause');assert.equal(get('audio').paused,true);get('play').fire('click');await Promise.resolve();assert.equal(get('audio').paused,false);assert.equal(ctx.location.destination,undefined,'Play button must resume Radio audio without redirect');
  await ctx.send('Stop');assert.equal(get('audio').getAttribute('src'),null);await ctx.send('Play it');assert.equal(get('audio').lastPlayed,radio.media);assert.equal(ctx.location.destination,undefined);assert.equal(backendCalls,0,'Prepared generic podcast commands should start immediately');
  await ctx.send('Play Experience with Angela Harris');assert.equal(backendCalls,1,'Specific episode searches must still reach backend');
+ await ctx.send('Play Seen Through Sound');assert.equal(get('audio').lastPlayed,seen[0].media);
+ voice.onBeforeListen();get('audio').fire('ended');assert.equal(get('audio').lastPlayed,'/listening-cue.wav','Listening cue must not advance Seen playlist');await ctx.send('Play it');assert.equal(get('audio').lastPlayed,seen[0].media);
+ await ctx.send('Pause');assert.equal(get('audio').paused,true);await ctx.send('Resume');assert.equal(get('audio').lastPlayed,seen[0].media);
+ get('audio').fire('ended');await Promise.resolve();assert.equal(get('audio').lastPlayed,seen[1].media,'End must automatically play second message and skip unsafe queue entries');
+ get('audio').fire('error');await Promise.resolve();assert.equal(get('audio').lastPlayed,seen[2].media,'Failed message must advance to next valid message');
+ get('audio').fire('ended');await Promise.resolve();assert.match(get('media-status').textContent,/Playlist finished/);assert.equal(get('audio').lastPlayed,seen[2].media,'Final message must not loop');
+ await ctx.send('Play Seen Through Sound');await ctx.send('Stop');get('audio').fire('ended');assert.equal(get('audio').getAttribute('src'),null,'Stop cancels automatic advancement');assert.match(get('media-status').textContent,/Stopped/);
+ await ctx.send('Play Seen Through Sound');await ctx.send('Play Even Though I’m Blind Experience');get('audio').fire('ended');await Promise.resolve();assert.equal(get('audio').lastPlayed,experience.media,'Switching to another source must clear Seen playlist');
+ console.log('PASS: Seen playlist advances, pause/resume preserve queue, cue does not advance, failures and unsafe entries are skipped, Stop/source switch cancel, final message does not loop.');
  console.log('PASS: shared audio activation, latest full Experience, preview fallback, Radio full native playback and controls without Spotify navigation, Play it restores episode and position, specific searches.');
 })().catch(e=>{console.error(e);process.exitCode=1});

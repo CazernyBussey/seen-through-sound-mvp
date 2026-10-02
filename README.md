@@ -34,6 +34,8 @@ Current authoritative WordPress links identify Radio Podcast YouTube playlist PL
 - Chromium browser: ETIB Radio decoded and played with advancing playback time; pause and resume tested; stop releases the source.
 - Chromium browser: latest full Experience episode decoded and played with advancing playback time; current episode was Sayyida Victoria Hillard, September 30, 2026.
 - Chromium browser: published Seen Through Sound message decoded and completed.
+- Chromium browser: standard Radio Podcast embed rendered accessible provider controls and was labeled Preview by Spotify; full playback is not claimed.
+- Chromium browser: explicit navigation reached Cazerny’s official page.
 - Chromium browser: launcher opens with focus in question input; keyboard Tab operates inside modal; Escape and explicit Close return focus to launcher.
 - Backend: expired dates filtered; unavailable live events source produces an accessible fallback instead of claiming saved events are current; unsafe URL requests do not execute.
 - Snapshot and live API tests cover intent routing and media selection. Backend request validation, same-origin POST enforcement, global throttling and bounded concurrent chat requests are implemented.
@@ -42,7 +44,7 @@ Current authoritative WordPress links identify Radio Podcast YouTube playlist PL
 
 - Real iPhone/Safari VoiceOver, physical microphone input, speech denial, and speech synthesis need device testing. No actual iPhone hardware is accessible in this execution environment. No claim of full accessibility certification is made.
 - WordPress.com simple hosting may remove custom scripts. The concrete zero-upgrade integration is an ordinary `Talk to ETIB` button/link near the start of approved pages. The modal script is supplied for environments that support scripts. Production WordPress integration has not been performed.
-- Radio Podcast retrieval currently indexes the episodes exposed in the public Spotify show response. A stable full public RSS feed has not been found. Spotify player availability is provider/browser dependent; explicit preview and full-episode link fallbacks remain available. No preview is labeled as a full episode.
+- Radio Podcast retrieval currently indexes the episodes exposed in the public Spotify show response. A stable full public RSS feed has not been found. Spotify player availability is provider/browser dependent; the anonymous embed was explicitly labeled Preview during browser QA; explicit preview and full-episode link fallbacks remain available. No preview is labeled as a full episode.
 - This is a deterministic ETIB command/retrieval assistant. Broader generative conversation opens the existing ETIB AI chat; no new model service was enabled.
 - Free Render instances sleep after idle time and can take roughly a minute to wake. Existing workspace bandwidth and build allowances still apply; no paid instance or upgrade was enabled, and existing workspace billing/spend limits were not changed. Do not treat free compute as unlimited no-overage hosting.
 - WordPress retrieval is bounded at 5,000 published items; the present published corpus had 34 pages/posts. Spotify archives are bounded by public provider responses. Retrieval failures use dated saved snapshots, with a clear warning. Events require a live source to claim currentness.

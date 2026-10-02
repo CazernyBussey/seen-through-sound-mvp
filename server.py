@@ -181,7 +181,7 @@ def reply(message,session=None):
         item=found[0];out['session']['last_id']=item['id']
         if play:out['session']['playing_id']=item['id']
         txt=('Latest available episode: ' if latest and s['live'] else 'Episode found: ')+item['title']+'. '+freshness(s)
-        if item.get('preview'):txt+=' The official Spotify player will open here. Playback availability depends on Spotify and your browser; an audio preview and full-episode link are also available.'
+        if item.get('preview'):txt+=' The official Spotify player will open here. Spotify may limit embedded playback to a preview. Use the episode link for the full conversation.'
         return answer(txt,found,{'type':'spotify' if item.get('preview') else 'play','item':cards([item])[0]} if play and item.get('media') else None)
     if dest and dest['id']=='seen':
         if play:

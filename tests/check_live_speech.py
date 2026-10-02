@@ -1,5 +1,5 @@
 """Explicit hosting-only integration check. Uses synthetic public commands, never user audio."""
-import base64,hashlib,json,os,socket,ssl,struct,threading,time,sys
+import base64,hashlib,json,os,socket,ssl,struct,threading,time,sys,select,traceback
 from pathlib import Path
 
 def hear(pcm):
@@ -33,19 +33,17 @@ def hear(pcm):
   if opcode==8:raise RuntimeError('Speech service closed: '+data[2:].decode(errors='replace'))
   if opcode==9:send(data,10);return {}
   return json.loads(data) if opcode==1 else {}
- def stream():
-  audio=pcm+bytes(32000*4)
-  try:
-   for offset in range(0,len(audio),640):
-    if stop.is_set():break
-    send({'user_audio_chunk':base64.b64encode(audio[offset:offset+640]).decode()});time.sleep(.02)
-  except OSError:pass
  try:
   send({'type':'conversation_initiation_client_data','source_info':{'source':'js_sdk','version':'1'}})
   deadline=time.monotonic()+20
+  audio=pcm+bytes(32000*4);offset=0;streaming=False;next_send=0
   while time.monotonic()<deadline:
+   now=time.monotonic()
+   if streaming and offset<len(audio) and now>=next_send:
+    send({'user_audio_chunk':base64.b64encode(audio[offset:offset+640]).decode()});offset+=640;next_send=now+.02
+   if not conn.pending() and not select.select([conn],[],[],.01)[0]:continue
    event=read()
-   if event.get('type')=='conversation_initiation_metadata':threading.Thread(target=stream,daemon=True).start()
+   if event.get('type')=='conversation_initiation_metadata':streaming=True
    elif event.get('type')=='ping':send({'type':'pong','event_id':event['ping_event']['event_id']})
    elif event.get('type')=='user_transcript':return event['user_transcription_event']['user_transcript']
   raise RuntimeError('Transcript timeout')
@@ -66,5 +64,6 @@ def run():
    if category!=expected:raise AssertionError(f'{case["command"]}: heard {transcript!r}, routed {category!r}')
    print('ETIB_SPEECH_CHECK PASS '+json.dumps({'command':case['command'],'transcript':transcript,'category':category}),flush=True)
   print('ETIB_SPEECH_CHECK ALL_PASS',flush=True)
- except Exception as error:print('ETIB_SPEECH_CHECK FAIL '+str(error),flush=True)
+ except Exception as error:
+  print('ETIB_SPEECH_CHECK FAIL '+str(error),flush=True);traceback.print_exc()
 if __name__=='__main__':run()

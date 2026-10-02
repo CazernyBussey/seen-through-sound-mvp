@@ -5,7 +5,9 @@ function createVoiceInput({Speech, button, feedback, onRequest, onBeforeListen, 
  let recognition=null, active=false, starting=false, busy=false, transcript='', failed=false, canceled=false;
  let idleLabel='Speak now';
  if(Speech){try{recognition=new Speech();idleLabel='Speak now';}catch{recognition=null;}}
- function reset(){active=false;starting=false;button.textContent=idleLabel;button.setAttribute('aria-pressed','false');button.disabled=busy;}
+ // Release capture audio mode before dispatching media commands (Safari/iOS).
+ function audioMode(type){try{if(typeof navigator!=='undefined'&&navigator.audioSession)navigator.audioSession.type=type;}catch{}}
+ function reset(){audioMode('playback');active=false;starting=false;button.textContent=idleLabel;button.setAttribute('aria-pressed','false');button.disabled=busy;}
  function abort(){canceled=true;transcript='';if(active||starting){try{recognition.abort()}catch{} }reset();}
  function setBusy(value){busy=value;button.disabled=value;}
  if(recognition){
@@ -27,7 +29,7 @@ function createVoiceInput({Speech, button, feedback, onRequest, onBeforeListen, 
   if(active||starting){canceled=true;transcript='';try{recognition.abort()}catch{}reset();feedback('Listening stopped.');return;}
   if(!recognition){feedback('This browser does not support microphone requests here. Open the site in Safari or Chrome, or open the voice assistant in Help and options.');onUnavailable();return;}
   transcript='';failed=false;canceled=false;starting=true;button.textContent='Cancel listening';button.setAttribute('aria-pressed','true');onBeforeListen();feedback('Starting microphone. Allow microphone access if your browser asks.');
-  try{recognition.start()}catch{reset();failed=true;feedback('The microphone could not start. Open this site in Safari or Chrome, or open the voice assistant in Help and options.');}
+  try{audioMode('play-and-record');recognition.start()}catch{reset();failed=true;feedback('The microphone could not start. Open this site in Safari or Chrome, or open the voice assistant in Help and options.');}
  });
  return {abort,setBusy};
 }

@@ -12,7 +12,7 @@ const doc={getElementById:get,querySelectorAll:()=>[],createElement:()=>new Elem
 const experience={id:'experience-latest',category:'experience',title:'Newest Experience',media:'https://d3ctxlq1ktw2nl.cloudfront.net/full.mp3',preview_media:'https://p.scdn.co/preview.mp3',spotify_url:'https://open.spotify.com/show/2ejjSEAbngiJDrvqiN6vR6',preview:false};
 const radio={id:'radio-latest',category:'radio_podcast',title:'Newest Radio Podcast',media:'https://p.scdn.co/radio.mp3',url:'https://open.spotify.com/episode/abc',preview:true};
 const win={addEventListener(){},parent:null};win.parent=win;
-const ctx=vm.createContext({document:doc,window:win,URL,location:{origin:'https://test.example',href:'https://test.example'},AbortController,setTimeout:()=>1,clearTimeout(){},createVoiceInput(o){voice=o;return{abort(){},setBusy(){}}},fetch:async url=>({ok:true,json:async()=>url==='/api/audio'?{experience,radio_podcast:radio}:url==='/api/registry'?[]:(backendCalls++,{text:'',session:{},action:null})})});
+const ctx=vm.createContext({document:doc,window:win,URL,location:{origin:'https://test.example',href:'https://test.example',assign(url){this.destination=url}},AbortController,setTimeout:()=>1,clearTimeout(){},createVoiceInput(o){voice=o;return{abort(){},setBusy(){}}},fetch:async url=>({ok:true,json:async()=>url==='/api/audio'?{experience,radio_podcast:radio}:url==='/api/registry'?[]:(backendCalls++,{text:'',session:{},action:null})})});
 vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../app.js'),'utf8'),ctx);
 (async()=>{
  await new Promise(setImmediate);
@@ -20,7 +20,7 @@ vm.runInContext(fs.readFileSync(require('node:path').join(__dirname,'../app.js')
  await ctx.send('Play Even Though I’m Blind Experience');assert.equal(get('audio').lastPlayed,experience.media);assert.equal(get('audio').paused,false);assert.equal(get('track-link').href,experience.spotify_url);
  get('audio').currentTime=42;voice.onBeforeListen();assert.equal(get('audio').lastPlayed,'/listening-cue.wav');await ctx.send('Play it');get('audio').fire('loadedmetadata');assert.equal(get('audio').lastPlayed,experience.media,'Play it must restore episode instead of replaying the cue');assert.equal(get('audio').currentTime,42);
  get('audio').fire('error');await Promise.resolve();await Promise.resolve();assert.equal(get('audio').lastPlayed,experience.preview_media,'Full audio failure must switch to available preview');assert.match(get('track').textContent,/preview/);
- await ctx.send('Play Even Though I’m Blind Radio Pod Cast');assert.equal(get('audio').lastPlayed,radio.media);assert.equal(backendCalls,0,'Prepared generic podcast commands should start immediately');
+ await ctx.send('Play Even Though I’m Blind Radio Pod Cast');assert.equal(ctx.location.destination,radio.url);assert.notEqual(get('audio').lastPlayed,radio.media,'Full episode request must not play snippet');assert.equal(backendCalls,0,'Prepared generic podcast commands should start immediately');
  await ctx.send('Play Experience with Angela Harris');assert.equal(backendCalls,1,'Specific episode searches must still reach backend');
- console.log('PASS: shared audio activation, latest full Experience, preview fallback, Radio preview, Play it restores episode and position, specific searches.');
+ console.log('PASS: shared audio activation, latest full Experience, preview fallback, Radio full Spotify navigation, Play it restores episode and position, specific searches.');
 })().catch(e=>{console.error(e);process.exitCode=1});

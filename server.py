@@ -144,7 +144,7 @@ def freshness(s):
 
 def cards(items):
     return [{k:v for k,v in x.items() if k not in ('raw','text')} for x in items]
-STOP={'find','search','show','me','the','an','a','old','older','article','articles','post','posts','episode','episodes','about','etib','podcast','with','that','for','please','can','you','i','want','to','on','what','did','it','of','latest','newest','current','play','tell','radio','experience'}
+STOP={'find','search','show','me','the','an','a','old','older','article','articles','post','posts','episode','episodes','about','etib','podcast','with','that','for','please','can','you','i','want','to','on','what','did','it','of','latest','newest','current','play','tell','radio','experience','full','preview','snippet'}
 def rank(items,q):
     words=[w for w in norm(q).split() if w not in STOP]
     if not words:return items[:5]
@@ -200,15 +200,18 @@ def reply(message,session=None):
     episode=bool(re.search(r'\b(episode|podcast)\b',q)) or bool(play and dest and dest['id'] in ['experience','radio_podcast'])
     if episode:
         kind='radio_podcast' if ('radio' in q or dest and dest['id']=='radio_podcast') else 'experience' if 'experience' in q else out['session'].get('podcast')
+        if play and not kind and re.fullmatch(r'(please )?play (the )?(latest |newest |full )?episode',q):kind='radio_podcast'
         if not kind:
             return answer('Which podcast: ETIB Radio Podcast or ETIB Experience?',[dict(r,title=r['name']) for r in REGISTRY if r['id'] in ['experience','radio_podcast']])
         out['session']['podcast']=kind;s=source(kind)
-        latest=any(w in q for w in ['latest','newest','recent','current']) or re.fullmatch(r'(play )?(radio podcast|etib radio podcast|experience|etib experience)',q) or not re.sub(r'\b(please|play|listen|to|the|a|start|playing|etib|even|though|i|m|im|blind|radio|experience|podcast|episode)\b',' ',q).strip()
+        latest=any(w in q for w in ['latest','newest','recent','current']) or re.fullmatch(r'(play )?(radio podcast|etib radio podcast|experience|etib experience)',q) or not re.sub(r'\b(please|play|listen|to|the|a|start|playing|etib|even|though|i|m|im|blind|radio|experience|podcast|episode|full|preview|snippet)\b',' ',q).strip()
         found=s['items'][:1] if latest else rank(s['items'],message)
         if not found:return answer('I could not retrieve a matching episode. Try a guest name or open the official podcast page. '+freshness(s),[dict(r,title=r['name']) for r in REGISTRY if r['id']==kind])
         item=found[0];out['session']['last_id']=item['id']
         if play:out['session']['playing_id']=item['id']
         txt=('Latest available episode: ' if latest and s['live'] else 'Episode found: ')+item['title']+'. '+freshness(s)
+        if play and kind=='radio_podcast' and 'preview' not in q and 'snippet' not in q:
+            return answer('Opening the full Radio Podcast episode in Spotify: '+item['title']+'.',found,{'type':'navigate','url':item.get('spotify_url',item['url'])})
         if item.get('preview'):txt+=' The Spotify preview is ready. Use the full episode link to continue listening on Spotify.'
         return answer(txt,found,{'type':'spotify' if item.get('preview') else 'play','item':cards([item])[0]} if play and (item.get('media') or item.get('preview')) else None)
     if dest and dest['id']=='seen':

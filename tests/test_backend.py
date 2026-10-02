@@ -10,10 +10,10 @@ r=check('Show ETIB Facebook');assert r['action'] is None and len(r['results'])==
 r=check('Take me to Cazerny Instagram');assert 'cazernybussey' in r['action']['url']
 r=check('Play ETIB Radio');assert r['action']['item']['media']=='https://stream.zeno.fm/qvlhys2h2odvv'
 for q in ["Play Even Though I'm Blind Radio","Play Even Though I’m Blind Radio","Listen to Even Though I'm Blind Experience Podcast","Play Even Though I'm Blind Experience","Play the newest Even Though I'm Blind Radio Podcast"]:
- result=check(q);assert result['action']['type'] in ['play','spotify']
+ result=check(q);assert result['action']['type'] in ['play','spotify','navigate']
  if 'Experience' in q:assert result['action']['item']['id']==server.CACHE['experience']['items'][0]['id']
 for q,kind in [('Play Even Though I’m Blind Radio Pod Cast','radio_podcast'),('Play Even Though I’m Blind Experience Pod Cast','experience')]:
- result=check(q);assert result['action']['item']['id']==server.CACHE[kind]['items'][0]['id']
+ result=check(q);assert result['results'][0]['id']==server.CACHE[kind]['items'][0]['id']
 for q,show in [('Play Even Though I’m Blind Radio Podcast on Spotify','6302Iby2KZMf4MWYq2sr16'),('Play Even Though I’m Blind Experience Podcast on Spotify','2ejjSEAbngiJDrvqiN6vR6')]:
  assert check(q)['action']['url']=='https://open.spotify.com/show/'+show
 for request in ['Seen Through Sound','Play Seen Through Sound','Scene to sound','Play scene through sound']:
@@ -27,11 +27,11 @@ assert check('Seen Through Sound')['action']['item']['id']==seen[0]['id']
 server.CACHE['seen']['items']=seen
 for q,a in [('Pause' ,'pause'),('Resume','resume'),('Stop','stop')]:assert check(q)['action']['type']==a
 r=check('Play the latest ETIB Experience episode');assert r['action']['type']=='play' and not r['results'][0]['preview']
-r=check('Play the latest ETIB Radio Podcast episode');assert r['action']['type']=='spotify' and r['action']['item']['preview']
+r=check('Play the latest ETIB Radio Podcast episode');assert r['action']['type']=='navigate' and r['action']['url']==server.CACHE['radio_podcast']['items'][0]['url']
 radio=server.CACHE['radio_podcast']['items'];server.CACHE['radio_podcast']['items']=[dict(radio[0],media=''),*radio[1:]]
-assert check('Play Even Though I’m Blind Radio Podcast')['action']['type']=='spotify'
+assert check('Play Even Though I’m Blind Radio Podcast')['action']['type']=='navigate'
 server.CACHE['radio_podcast']['items']=radio
-r=check('Play the latest episode');assert r['action'] is None and 'Which podcast' in r['text']
+r=check('Play the latest episode');assert r['action']['type']=='navigate'
 r=check('Find the episode with Angela Harris',{'podcast':'experience'});assert 'Angela' in r['results'][0]['title']
 r=check('Find an old article about accessibility');assert r['results']
 r=check('What is the newest ETIB blog post?');assert 'Dear Fathers' in r['results'][0]['title']
@@ -54,3 +54,8 @@ matched=server.load_experience()[0]
 assert matched['preview_media']==preview['media'] and matched['spotify_url']==preview['url']
 server.load_experience_feed,server.fetch,server.parse_spotify=original_feed,original_fetch,original_parse
 print('PASS: Experience RSS failure uses Spotify preview; full episode retains matching preview fallback.')
+
+assert check('Play episode')['action']['url']==server.CACHE['radio_podcast']['items'][0]['url']
+assert check('Play full episode',{'podcast':'radio_podcast'})['action']['type']=='navigate'
+assert check('Play latest Radio Podcast preview')['action']['type']=='spotify'
+assert check('Play episode',{'podcast':'experience'})['action']['type']=='play'

@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: talk-to-etib
+    runtime: python
+    plan: free
+    branch: talk-to-etib-prototype
+    buildCommand: python -m py_compile server.py
+    startCommand: python server.py
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.13.7

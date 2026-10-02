@@ -1,97 +1,14 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Seen Through Sound | Even Though I’m Blind Voices Project</title>
-  <meta name="description" content="Record a short message of hope, strength, or encouragement through Seen Through Sound, an Even Though I’m Blind Voices Project." />
-  <link rel="icon" href="assets/seen-through-sound-logo.svg?v=seen-through-sound-logo-20260521" type="image/svg+xml" />
-  <link rel="stylesheet" href="styles.css" />
-  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="app.js"></script>
-</head>
-<body>
-  <a class="skip-link" href="#main">Skip to main content</a>
-  <header class="site-header" role="banner">
-    <div class="brand-lockup">
-      <img class="brand-logo" src="assets/seen-through-sound-logo.svg?v=seen-through-sound-logo-20260521" alt="Seen Through Sound" />
-      <div>
-        <p class="eyebrow">Seen Through Sound</p>
-        <h1>Seen Through Sound</h1>
-        <p class="tagline">Encouragement does not have to be seen to be felt.</p>
-      </div>
-    </div>
-    <nav aria-label="Main navigation">
-      <a href="playlist.html">Listen to Encouragement</a>
-    </nav>
-  </header>
-
-  <main id="main" class="container">
-    <section class="hero" aria-labelledby="mission-heading">
-      <h2 id="mission-heading">Speak life into someone’s day.</h2>
-      <p>Seen Through Sound is a voice-powered encouragement platform created by Even Though I’m Blind, Inc. Submitted messages are reviewed before publication, and only approved messages may be shared publicly as part of the encouragement library.</p>
-    </section>
-
-    <section class="card" aria-labelledby="record-heading">
-      <h2 id="record-heading">Record Your Encouragement</h2>
-      <p id="record-instructions">Record a clear message between 15 and 60 seconds. Before submitting, you can stop, listen, reset, and record again.</p>
-
-      <div class="notice" aria-labelledby="review-heading">
-        <h3 id="review-heading">Before you record</h3>
-        <ul>
-          <li>Messages are reviewed before publication.</li>
-          <li>Not every submitted message will be shared.</li>
-          <li>Please avoid private information, hate speech, profanity, copyrighted music, or anything you do not have permission to share.</li>
-        </ul>
-      </div>
-
-      <div class="status-panel" role="status" aria-live="polite" aria-atomic="true">
-        <p><strong>Status:</strong> <span id="statusText">Ready to record.</span></p>
-        <p><strong>Timer:</strong> <span id="timerText">0 seconds</span></p>
-      </div>
-
-      <div class="controls" role="group" aria-label="Recording controls">
-        <button id="recordButton" class="record-toggle" type="button" aria-pressed="false">Start Recording</button>
-        <button id="resetButton" type="button" disabled>Reset Recording</button>
-      </div>
-
-      <div id="previewWrap" class="preview hidden">
-        <h3>Preview your message</h3>
-        <p>Listen to your recording before you submit it for review.</p>
-        <audio id="previewAudio" controls aria-label="Preview your recorded encouragement message"></audio>
-      </div>
-
-      <form id="submissionForm" class="form">
-        <p id="form-help" class="form-help">Your name, email, and title help us review and organize submissions.</p>
-
-        <label for="speakerName">Your name</label>
-        <input id="speakerName" name="speakerName" type="text" autocomplete="name" placeholder="Example: Cazerny" />
-        <p id="name-help" class="form-help">Leave this blank or choose anonymous below if you do not want your name shown with an approved message.</p>
-
-        <label class="checkbox-row" for="anonymous">
-          <input id="anonymous" name="anonymous" type="checkbox" />
-          Share my message as anonymous if approved
-        </label>
-
-        <label for="speakerEmail">Your email address</label>
-        <input id="speakerEmail" name="speakerEmail" type="email" autocomplete="email" placeholder="name@example.com" />
-        <p id="email-help" class="form-help">Your email is private and will not appear publicly with your message.</p>
-
-        <label for="messageTitle">Message title</label>
-        <input id="messageTitle" name="messageTitle" type="text" maxlength="80" placeholder="Example: Keep going" />
-
-        <label class="checkbox-row" for="consent">
-          <input id="consent" name="consent" type="checkbox" required />
-          I confirm that I have the right to submit this audio message, and I give Even Though I’m Blind, Inc. permission to review, store, edit for clarity or length, and share it publicly if approved, including online, in promotional materials, and in project storytelling.
-        </label>
-
-        <button id="submitButton" type="submit" disabled>Submit Audio Message for Review</button>
-      </form>
-    </section>
-  </main>
-
-  <footer class="site-footer">
-    <p>Seen Through Sound · An Even Though I’m Blind Voices Project</p>
-  </footer>
-</body>
-</html>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Speak or type to explore ETIB, listen to radio and podcasts, find articles and events, and connect with the community."><title>Talk to ETIB</title><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head><body>
+<a class="skip" href="#question">Skip to your question</a>
+<header><a href="https://eventhoughimblind.com/" class="brand"><img src="https://eventhoughimblind.com/wp-content/uploads/2025/05/img_1077-1-1.png" alt="Even Though I’m Blind, Inc. gold globe logo"><span>Even Though I’m Blind, Inc.</span></a><button id="close" type="button" hidden>Close Talk to ETIB</button></header>
+<main id="main"><div class="intro"><p class="eyebrow">YOUR CONVERSATION WITH ETIB</p><h1>Talk to ETIB</h1><p>Find a story. Hear a voice. Connect with your community.</p></div>
+<section class="workspace" aria-labelledby="ask-heading"><h2 id="ask-heading">What would you like to do?</h2>
+<form id="ask"><label for="question">Your question or request</label><textarea id="question" rows="2" maxlength="1000" placeholder="Try: Play ETIB Radio" aria-describedby="input-help"></textarea><p id="input-help" class="muted">Type, use your keyboard’s dictation, or select Speak. Voice is optional.</p><div class="controls"><button type="submit" id="send" class="primary">Send</button><button type="button" id="speak" aria-pressed="false">Speak</button><button type="button" id="cancel-request" hidden>Cancel request</button></div></form>
+<div class="quick" aria-label="Suggested requests"><button type="button" data-question="Play ETIB Radio">Play radio</button><button type="button" data-question="Show upcoming events">Upcoming events</button><button type="button" data-question="What is the newest ETIB blog post?">Latest article</button></div>
+<details><summary>What can I ask?</summary><ul><li>Play the latest ETIB Experience episode.</li><li>Play the latest ETIB Radio Podcast episode.</li><li>Find the episode with Angela Harris.</li><li>Find articles about accessibility.</li><li>Take me to ETIB Facebook.</li><li>Play Seen Through Sound.</li><li>Pause. Resume. Stop.</li></ul><p>ETIB commands and public content searches work here. For broader questions, <a href="https://eventhoughimblind.zapier.app/">open ETIB AI chat</a>.</p></details>
+<p id="status" role="status" aria-live="polite" aria-atomic="true">Ready for your question.</p><div id="error" role="alert"></div>
+<section id="response" aria-labelledby="response-heading" hidden><h2 id="response-heading" tabindex="-1">ETIB response</h2><p id="answer"></p><div id="results"></div></section>
+<section id="player" aria-labelledby="playing-heading" hidden><h2 id="playing-heading">Now playing</h2><p id="track"></p><p id="media-status" role="status" aria-live="polite" aria-atomic="true"></p><audio id="audio" controls preload="none" aria-label="Selected ETIB audio"></audio><div class="controls"><button id="play" type="button">Play selected audio</button><button id="pause" type="button">Pause audio</button><button id="stop" type="button">Stop audio</button></div><a id="track-link">Open the media’s official page</a></section>
+<details id="history-details"><summary>Conversation history</summary><ol id="history"></ol><button id="clear" type="button">Clear conversation</button></details>
+<div class="preferences"><label><input type="checkbox" id="read-aloud"> Read answers aloud</label><button type="button" id="silence">Stop spoken answer</button></div></section>
+</main><footer><p>Anonymous session. Your conversation stays in this page and clears when you leave. Optional speech recognition may use your browser’s speech service.</p><a href="https://eventhoughimblind.com/">Return to ETIB</a> <a href="/integration">Website launcher</a></footer></body></html>

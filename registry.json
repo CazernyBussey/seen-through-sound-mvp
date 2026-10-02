@@ -1,0 +1,645 @@
+[
+  {
+    "id": "home",
+    "name": "Even Though I’m Blind",
+    "aliases": [
+      "even though i m blind",
+      "mission",
+      "etib",
+      "home"
+    ],
+    "description": "Even Though I’m Blind, Inc. is a 501(c)(3) nonprofit advancing advocacy, accessible media, creativity, education, resources, community connection, visibility, and opportunity.",
+    "url": "https://eventhoughimblind.com/",
+    "category": "project",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "about",
+    "name": "About ETIB",
+    "aliases": [
+      "about etib",
+      "nonprofit",
+      "programs",
+      "services",
+      "about"
+    ],
+    "description": "ETIB amplifies voices, expands access, spotlights talent, and connects people with opportunity.",
+    "url": "https://eventhoughimblind.com/about-us/",
+    "category": "project",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "radio",
+    "name": "ETIB Radio",
+    "aliases": [
+      "radio station",
+      "etib radio",
+      "station",
+      "radio"
+    ],
+    "description": "Listen to ETIB Radio, featuring blind and visually impaired artists and independent talent.",
+    "url": "https://eventhoughimblind.com/even-though-im-blind-radio/",
+    "category": "media",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source",
+    "media": "https://stream.zeno.fm/qvlhys2h2odvv"
+  },
+  {
+    "id": "radio_podcast",
+    "name": "ETIB Radio Podcast",
+    "aliases": [
+      "etib radio podcast",
+      "radio podcast"
+    ],
+    "description": "Interviews with artists, hosted by Ariana Dewberry and Cazerny Bussey.",
+    "url": "https://open.spotify.com/show/6302Iby2KZMf4MWYq2sr16",
+    "category": "media",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "experience",
+    "name": "ETIB Experience Podcast",
+    "aliases": [
+      "experience podcast",
+      "etib experience",
+      "experience"
+    ],
+    "description": "Conversations amplifying the voices and lived experiences of blind and visually impaired people.",
+    "url": "https://eventhoughimblind.com/even-though-im-blind-experience/",
+    "category": "media",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source",
+    "feed": "https://anchor.fm/s/1046548ac/podcast/rss"
+  },
+  {
+    "id": "seen",
+    "name": "Seen Through Sound",
+    "aliases": [
+      "encouragement playlist",
+      "seen through sound",
+      "encouragement"
+    ],
+    "description": "Hear published messages of hope, strength, and encouragement.",
+    "url": "https://cazernybussey.github.io/seen-through-sound-mvp/playlist.html",
+    "category": "media",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "directory",
+    "name": "Community Connect Directory",
+    "aliases": [
+      "community connect",
+      "businesses",
+      "directory",
+      "resources"
+    ],
+    "description": "Discover businesses and services owned by or serving blind and visually impaired people.",
+    "url": "https://etib-community-connect-1.onrender.com/index.html",
+    "category": "project",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "events",
+    "name": "ETIB Upcoming Events",
+    "aliases": [
+      "upcoming events",
+      "event calendar",
+      "calendar",
+      "events"
+    ],
+    "description": "Find confirmed public dates and event details. Times and locations still being confirmed remain marked to be determined.",
+    "url": "https://eventhoughimblind.com/even-though-im-blind-events-calendar/",
+    "category": "project",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "blog",
+    "name": "ETIB Blog",
+    "aliases": [
+      "etib blog",
+      "articles",
+      "blog"
+    ],
+    "description": "Read ETIB community stories, resources, insights, advocacy, and updates.",
+    "url": "https://eventhoughimblind.com/etib-blog/",
+    "category": "project",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "donate",
+    "name": "Donate to ETIB",
+    "aliases": [
+      "support etib",
+      "donations",
+      "donation",
+      "donate"
+    ],
+    "description": "Open ETIB’s donation page to review and choose how you wish to contribute.",
+    "url": "https://donorbox.org/donate-to-etib-even-though-i-m-blind-inc",
+    "category": "participation",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "join",
+    "name": "Join ETIB",
+    "aliases": [
+      "partnerships",
+      "participate",
+      "partnership",
+      "sponsorship",
+      "join etib",
+      "volunteer",
+      "sponsor",
+      "join"
+    ],
+    "description": "Connect with ETIB to participate, volunteer, or discuss partnerships and sponsorships.",
+    "url": "https://eventhoughimblind.com/join-us/",
+    "category": "participation",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "sponsors",
+    "name": "ETIB Sponsors",
+    "aliases": [
+      "meet sponsors",
+      "our sponsors"
+    ],
+    "description": "Meet organizations supporting ETIB’s mission.",
+    "url": "https://eventhoughimblind.com/sponsors/",
+    "category": "project",
+    "owner": "etib",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "submissions",
+    "name": "Submit Music to ETIB Radio",
+    "aliases": [
+      "music submissions",
+      "artist submission",
+      "submit music"
+    ],
+    "description": "Review the music submission form and submit your work for consideration.",
+    "url": "https://form.jotform.com/260746645237059",
+    "category": "participation",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "newsletter",
+    "name": "ETIB Newsletter",
+    "aliases": [
+      "newsletter",
+      "etib news"
+    ],
+    "description": "Sign up for ETIB news and updates.",
+    "url": "https://eventhoughimblind.us22.list-manage.com/subscribe?id=71cc3709da&u=aa9a51fa8835cd104e204b56a",
+    "category": "participation",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "ai",
+    "name": "ETIB AI Chat",
+    "aliases": [
+      "ai chat",
+      "chatbot",
+      "ask ai"
+    ],
+    "description": "Open ETIB’s existing text assistant for broader questions.",
+    "url": "https://eventhoughimblind.zapier.app/",
+    "category": "project",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "voice_assistant",
+    "name": "ETIB Voice Assistant",
+    "aliases": [
+      "voice assistant",
+      "elevenlabs"
+    ],
+    "description": "Open ETIB’s existing Media Network Voice Assistant.",
+    "url": "https://elevenlabs.io/app/talk-to?agent_id=agent_5001m3n5jkyefgkaeecmn25c7bsc",
+    "category": "project",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "radio_youtube",
+    "name": "ETIB Radio Podcast on YouTube",
+    "aliases": [
+      "radio podcast youtube"
+    ],
+    "description": "Official Radio Podcast playlist linked on the current ETIB website.",
+    "url": "https://youtube.com/playlist?list=PLGg6X4j2zFkk",
+    "category": "media",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "experience_youtube",
+    "name": "ETIB Experience on YouTube",
+    "aliases": [
+      "experience podcast youtube",
+      "experience youtube"
+    ],
+    "description": "Official Experience playlist linked on the current ETIB website.",
+    "url": "https://youtube.com/playlist?list=PLq11DKhUJUuaDFPjBjNZSu5e96Dx2hRu7",
+    "category": "media",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "etib_facebook",
+    "name": "ETIB Facebook",
+    "aliases": [
+      "etib facebook",
+      "facebook"
+    ],
+    "description": "ETIB’s official facebook destination, linked from the ETIB website.",
+    "url": "https://www.facebook.com/share/1CG4L49PWV/?mibextid=wwXIfr",
+    "category": "social",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "etib_instagram",
+    "name": "ETIB Instagram",
+    "aliases": [
+      "etib instagram",
+      "instagram"
+    ],
+    "description": "ETIB’s official instagram destination, linked from the ETIB website.",
+    "url": "https://www.instagram.com/eventhoughimblind",
+    "category": "social",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "etib_youtube",
+    "name": "ETIB Youtube",
+    "aliases": [
+      "etib youtube",
+      "youtube"
+    ],
+    "description": "ETIB’s official youtube destination, linked from the ETIB website.",
+    "url": "https://youtube.com/@eventhoughimblind",
+    "category": "social",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "etib_tiktok",
+    "name": "ETIB Tiktok",
+    "aliases": [
+      "etib tiktok",
+      "tiktok"
+    ],
+    "description": "ETIB’s official tiktok destination, linked from the ETIB website.",
+    "url": "https://www.tiktok.com/@eventhoughimblind",
+    "category": "social",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "etib_x",
+    "name": "ETIB X",
+    "aliases": [
+      "twitter",
+      "etib x",
+      "x"
+    ],
+    "description": "ETIB’s official x destination, linked from the ETIB website.",
+    "url": "https://twitter.com/ETIBGlobalvoice",
+    "category": "social",
+    "owner": "etib",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny",
+    "name": "Cazerny Bussey",
+    "aliases": [
+      "cazerny bussey",
+      "cazerny",
+      "founder",
+      "ceo"
+    ],
+    "description": "Cazerny Bussey is a Brooklyn-born recording artist, songwriter, producer, author, entrepreneur, speaker, advocate, father, and Founder and CEO of Even Though I’m Blind, Inc.",
+    "url": "https://eventhoughimblind.com/cazernybussey/",
+    "category": "project",
+    "owner": "cazerny",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "music",
+    "name": "Cazerny Music",
+    "aliases": [
+      "cazerny music",
+      "music",
+      "songs"
+    ],
+    "description": "Explore Cazerny Bussey’s music.",
+    "url": "https://eventhoughimblind.com/cazernymusic/",
+    "category": "project",
+    "owner": "cazerny",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "book",
+    "name": "The Money Master",
+    "aliases": [
+      "financial literacy",
+      "money master",
+      "book"
+    ],
+    "description": "The Money Master: Alex’s Guide to Financial Literacy helps young readers learn saving, investing, entrepreneurship, responsibility, and smart choices.",
+    "url": "https://a.co/d/gjUTNcj",
+    "category": "project",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "rewards",
+    "name": "C.FLY Rewards",
+    "aliases": [
+      "c fly rewards",
+      "cfly rewards",
+      "rewards",
+      "game"
+    ],
+    "description": "Cazerny Bussey’s accessible fan engagement and rewards experience.",
+    "url": "https://eventhoughimblind.com/cfly-rewards-game/",
+    "category": "project",
+    "owner": "cazerny",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cfly_ai",
+    "name": "C.FLY AI",
+    "aliases": [
+      "cazerny ai",
+      "c fly ai",
+      "cfly ai"
+    ],
+    "description": "Cazerny Bussey’s existing AI chatbot.",
+    "url": "https://cfly-ai.zapier.app/",
+    "category": "project",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "press",
+    "name": "Cazerny Media and Press",
+    "aliases": [
+      "media and press",
+      "cazerny press",
+      "press"
+    ],
+    "description": "Cazerny’s media features, appearances, and interviews.",
+    "url": "https://eventhoughimblind.com/cazerny-bussey-media-press/",
+    "category": "project",
+    "owner": "cazerny",
+    "external": false,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_instagram",
+    "name": "Cazerny Bussey on Instagram",
+    "aliases": [
+      "cazerny instagram",
+      "instagram"
+    ],
+    "description": "Cazerny’s official instagram destination, linked from his ETIB page.",
+    "url": "https://www.instagram.com/cazernybussey/?hl=en",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_youtube",
+    "name": "Cazerny Bussey on Youtube",
+    "aliases": [
+      "cazerny youtube",
+      "youtube"
+    ],
+    "description": "Cazerny’s official youtube destination, linked from his ETIB page.",
+    "url": "https://www.youtube.com/channel/UCMyObEWpSHQrBpCscD0G-pQ",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_tiktok",
+    "name": "Cazerny Bussey on Tiktok",
+    "aliases": [
+      "cazerny tiktok",
+      "tiktok"
+    ],
+    "description": "Cazerny’s official tiktok destination, linked from his ETIB page.",
+    "url": "https://www.tiktok.com/@cazernybussey",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_linkedin",
+    "name": "Cazerny Bussey on Linkedin",
+    "aliases": [
+      "cazerny linkedin",
+      "linkedin"
+    ],
+    "description": "Cazerny’s official linkedin destination, linked from his ETIB page.",
+    "url": "https://www.linkedin.com/in/cazerny-bussey-9b7a8725a/",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_threads",
+    "name": "Cazerny Bussey on Threads",
+    "aliases": [
+      "cazerny threads",
+      "threads"
+    ],
+    "description": "Cazerny’s official threads destination, linked from his ETIB page.",
+    "url": "https://www.threads.com/@cazernybussey",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_facebook",
+    "name": "Cazerny Bussey on Facebook",
+    "aliases": [
+      "cazerny facebook",
+      "facebook"
+    ],
+    "description": "Cazerny’s official facebook destination, linked from his ETIB page.",
+    "url": "https://www.facebook.com/Cazernybussey",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_x",
+    "name": "Cazerny Bussey on X",
+    "aliases": [
+      "cazerny x",
+      "twitter",
+      "x"
+    ],
+    "description": "Cazerny’s official x destination, linked from his ETIB page.",
+    "url": "https://x.com/CazernyBussey",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_substack",
+    "name": "Cazerny Bussey on Substack",
+    "aliases": [
+      "cazerny substack",
+      "substack"
+    ],
+    "description": "Cazerny’s official substack destination, linked from his ETIB page.",
+    "url": "https://cazernybussey.substack.com/",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  },
+  {
+    "id": "cazerny_flickr",
+    "name": "Cazerny Bussey on Flickr",
+    "aliases": [
+      "cazerny flickr",
+      "flickr"
+    ],
+    "description": "Cazerny’s official flickr destination, linked from his ETIB page.",
+    "url": "https://flickr.com/photos/201724312@N03",
+    "category": "social",
+    "owner": "cazerny",
+    "external": true,
+    "action_type": "navigation",
+    "last_verified": "2026-10-02",
+    "verification": "Current ETIB website or linked official public source"
+  }
+]

@@ -12,7 +12,7 @@ function createVoiceInput({Speech, button, feedback, onRequest, onBeforeListen, 
  function setBusy(value){busy=value;button.disabled=value||ending;}
  if(recognition){
   recognition.lang='en-US';recognition.interimResults=false;recognition.continuous=false;
-  recognition.onstart=()=>{captured=true;starting=false;active=true;button.textContent='Stop listening';button.setAttribute('aria-pressed','true');feedback('Listening. Say a request, such as Play ETIB Radio.');onListening?.();};
+  recognition.onstart=()=>{captured=true;starting=false;active=true;button.textContent='Stop listening';button.setAttribute('aria-pressed','true');feedback('Listening…');onListening?.();};
   recognition.onresult=event=>{for(let i=event.resultIndex||0;i<event.results.length;i++){if(event.results[i].isFinal!==false)transcript+=event.results[i][0].transcript+' ';}};
   recognition.onerror=event=>{if(canceled&&event.error==='aborted')return;failed=true;const messages={
    'not-allowed':'Microphone access was not allowed. Open this site in Safari or Chrome and allow its microphone. Select Help and options for another voice assistant.',
@@ -21,14 +21,14 @@ function createVoiceInput({Speech, button, feedback, onRequest, onBeforeListen, 
    'network':'The browser speech service could not connect. Try again, or open the voice assistant in Help and options.',
    'no-speech':'No speech was heard. Select Speak now and try again.',
    'aborted':'Listening stopped. Select Speak now to try again.'};feedback(messages[event.error]||'Speech recognition could not complete. Try again, or open the voice assistant in Help and options.');};
-  recognition.onend=()=>{const request=transcript.trim(),wasCaptured=captured;captured=false;transcript='';ending=wasCaptured;reset();const finish=()=>{ending=false;reset();if(!canceled&&!failed&&request){feedback('Heard: '+request+'. Running your request.');onRequest(request);}else if(!canceled&&!failed)feedback('No request was heard. Select Speak now and try again.');};const cue=wasCaptured?onAfterListen?.():null;if(cue?.then)cue.then(finish,finish);else finish();};
+  recognition.onend=()=>{const request=transcript.trim(),wasCaptured=captured;captured=false;transcript='';ending=wasCaptured;reset();const finish=()=>{ending=false;reset();if(!canceled&&!failed&&request){feedback('Opening…');onRequest(request);}else if(!canceled&&!failed)feedback('No request was heard. Select Speak now and try again.');};const cue=wasCaptured?onAfterListen?.():null;if(cue?.then)cue.then(finish,finish);else finish();};
  }
  button.textContent=idleLabel;
  button.addEventListener('click',()=>{
   if(busy||ending)return;
   if(active||starting){canceled=true;transcript='';try{recognition.abort()}catch{}reset();feedback('Listening stopped.');return;}
   if(!recognition){feedback('This browser does not support microphone requests here. Open the site in Safari or Chrome, or open the voice assistant in Help and options.');onUnavailable();return;}
-  transcript='';failed=false;canceled=false;captured=false;starting=true;button.textContent='Cancel listening';button.setAttribute('aria-pressed','true');onBeforeListen();feedback('Starting microphone. Allow microphone access if your browser asks.');
+  transcript='';failed=false;canceled=false;captured=false;starting=true;button.textContent='Cancel listening';button.setAttribute('aria-pressed','true');onBeforeListen();feedback('Starting microphone…');
   try{audioMode('play-and-record');recognition.start()}catch{reset();failed=true;feedback('The microphone could not start. Open this site in Safari or Chrome, or open the voice assistant in Help and options.');}
  });
  return {abort,setBusy,isListening:()=>active};

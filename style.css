@@ -2,3 +2,15 @@
 
 
 .voice-controls #speak{width:100%;min-height:72px;font-size:1.4rem}#audio:not([controls]){display:none}main>h1{margin:1rem 0 1.5rem}
+
+/* Persistent microphone control; content and playback stay above it. */
+body{padding-bottom:calc(14rem + env(safe-area-inset-bottom,0px))}
+.voice-dock{position:fixed;z-index:20;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:.6rem max(1rem,env(safe-area-inset-left,0px)) calc(.8rem + env(safe-area-inset-bottom,0px));max-height:45svh;overflow:auto}
+.voice-dock .voice-controls,.voice-dock #voice-status{max-width:852px;margin-left:auto;margin-right:auto}
+.voice-dock #voice-status{margin-top:0;margin-bottom:.4rem;font-size:.9375rem}
+.voice-dock .voice-controls{flex-wrap:nowrap}
+.voice-dock #speak{flex:1;min-width:0}
+.voice-dock #cancel-request{flex:0 1 auto}
+#player,#response{scroll-margin-bottom:15rem}
+main{min-height:45svh}
+@media(max-height:450px){body{padding-bottom:calc(9rem + env(safe-area-inset-bottom,0px))}.voice-dock #speak{min-height:48px;font-size:1.125rem}.voice-dock #voice-status{font-size:.875rem}}

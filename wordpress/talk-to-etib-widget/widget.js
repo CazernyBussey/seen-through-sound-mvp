@@ -2,7 +2,7 @@
 (()=>{
  const script=document.currentScript;
  if(window.etibWidgetLoaded)return;window.etibWidgetLoaded=true;
- const appOrigin=new URL(script.dataset.etibApp||script.src).origin;
+ const appOrigin='https://talk-to-etib.onrender.com';
  const launchers=[...document.querySelectorAll('[data-etib-launcher]')];
  if(!launchers.length)return;
  const top=document.querySelector('[data-etib-top]');

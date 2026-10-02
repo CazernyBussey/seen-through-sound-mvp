@@ -275,7 +275,7 @@ class Handler(BaseHTTPRequestHandler):
                 if items:
                     item=dict(items[0]);item.setdefault('spotify_url',EXPERIENCE_SPOTIFY if key=='experience' else item['url']);latest[key]=cards([item])[0]
             return self.send(200,json.dumps(latest).encode())
-        mapping={'/speech-sdk.js':'speech-sdk.js','/managed-voice.js':'managed-voice.js','/rawAudioProcessor.js':'rawAudioProcessor.js','/audioConcatProcessor.js':'audioConcatProcessor.js','/libsamplerate.worklet.js':'libsamplerate.worklet.js','/':'index.html','/index.html':'index.html','/listening-cue.wav':'listening-cue.wav','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
+        mapping={'/speech-sdk.js':'speech-sdk.js','/managed-voice.js':'managed-voice.js','/rawAudioProcessor.js':'rawAudioProcessor.js','/audioConcatProcessor.js':'audioConcatProcessor.js','/libsamplerate.worklet.js':'libsamplerate.worklet.js','/':'index.html','/index.html':'index.html','/listening-cue.wav':'listening-cue.wav','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/widget.css':'wordpress/talk-to-etib-widget/widget.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
         f=mapping.get(path)
         if not f:return self.send(404,b'{"error":"Not found"}')
         kind='audio/wav' if f.endswith('wav') else 'audio/mpeg' if f.endswith('mp3') else 'text/html; charset=utf-8' if f.endswith('html') else 'text/javascript; charset=utf-8' if f.endswith('js') else 'text/css; charset=utf-8'

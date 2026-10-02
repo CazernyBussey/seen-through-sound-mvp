@@ -37,6 +37,6 @@ const speak=message=>{const before=beeps;get('speak').fire('click');assert.equal
  windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:minimize'}});assert.equal(get('audio').paused,false,'Minimize must leave audio playing');assert.equal(get('audio').currentTime,27);
  windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:command',command:'pause'}});assert.equal(get('audio').paused,true);
  windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:command',command:'resume'}});await new Promise(setImmediate);assert.equal(get('audio').paused,false);assert.equal(get('audio').currentTime,27);
- windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:stop'}});assert.equal(get('audio').paused,true);assert.equal(get('audio').getAttribute('src'),null);assert.match(parentMessages.at(-1).data.text,/Stopped/);
+ windowEvents.message({origin:'https://test.example',source:win,data:{type:'etib:stop'}});assert.equal(get('audio').paused,true);assert.equal(get('audio').getAttribute('src'),null);assert.equal(parentMessages.at(-1).data.text,'Ready.');assert.equal(parentMessages.at(-1).data.selected,false);assert.equal(get('player').hidden,true);
  console.log('PASS: managed SDK callback-to-player integration, repeated commands, microphone/media separation, pause/resume position, full podcasts, Seen requests, controls during capture and dictation form.');
 })().catch(e=>{console.error(e);process.exitCode=1});

@@ -179,8 +179,8 @@ def reply(message,session=None):
         item=found[0];out['session']['last_id']=item['id']
         if play:out['session']['playing_id']=item['id']
         txt=('Latest available episode: ' if latest and s['live'] else 'Episode found: ')+item['title']+'. '+freshness(s)
-        if item.get('preview'):txt+=' Spotify provides a preview here. Use the episode link for the full conversation.'
-        return answer(txt,found,{'type':'play','item':cards([item])[0]} if play and item.get('media') else None)
+        if item.get('preview'):txt+=' The official Spotify player will open here. Playback availability depends on Spotify and your browser; an audio preview and full-episode link are also available.'
+        return answer(txt,found,{'type':'spotify' if item.get('preview') else 'play','item':cards([item])[0]} if play and item.get('media') else None)
     if dest and dest['id']=='seen':
         if play:
             s=source('seen');found=s['items'][:1]
@@ -208,7 +208,7 @@ class Handler(BaseHTTPRequestHandler):
     def send(self,status,body,kind='application/json; charset=utf-8'):
         self.send_response(status);self.send_header('Content-Type',kind);
         if self.path=='/api/registry':self.send_header('Access-Control-Allow-Origin','*')
-        self.send_header('Cache-Control','no-store' if '/api/' in self.path else 'public, max-age=300');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Referrer-Policy','no-referrer');self.send_header('Permissions-Policy','camera=(), geolocation=(), microphone=(self)');self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; media-src https:; connect-src 'self'; frame-src 'self'; frame-ancestors 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; base-uri 'none'; form-action 'self'; object-src 'none'");self.end_headers();self.wfile.write(body)
+        self.send_header('Cache-Control','no-store' if '/api/' in self.path else 'public, max-age=300');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Referrer-Policy','no-referrer');self.send_header('Permissions-Policy','camera=(), geolocation=(), microphone=(self)');self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' https://open.spotify.com; style-src 'self'; img-src 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; media-src https:; connect-src 'self' https://open.spotify.com; frame-src 'self' https://open.spotify.com; frame-ancestors 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; base-uri 'none'; form-action 'self'; object-src 'none'");self.end_headers();self.wfile.write(body)
     def do_GET(self):
         path=urlparse(self.path).path
         if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','paid_services':False}).encode())

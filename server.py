@@ -252,10 +252,10 @@ class Handler(BaseHTTPRequestHandler):
     def send(self,status,body,kind='application/json; charset=utf-8'):
         self.send_response(status);self.send_header('Content-Type',kind);
         if self.path=='/api/registry':self.send_header('Access-Control-Allow-Origin','*')
-        self.send_header('Cache-Control','no-store' if '/api/' in self.path else 'no-cache');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Referrer-Policy','no-referrer');self.send_header('Permissions-Policy','camera=(), geolocation=(), microphone=(self)');self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; media-src https:; connect-src 'self'; frame-src 'self' https://open.spotify.com; frame-ancestors 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; base-uri 'none'; form-action 'self'; object-src 'none'");self.end_headers();self.wfile.write(body)
+        self.send_header('Cache-Control','no-store' if '/api/' in self.path else 'no-cache');self.send_header('X-Content-Type-Options','nosniff');self.send_header('Referrer-Policy','no-referrer');self.send_header('Permissions-Policy','camera=(), geolocation=(), microphone=(self)');self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; media-src https:; connect-src 'self' wss://api.elevenlabs.io; frame-src 'self' https://open.spotify.com; frame-ancestors 'self' https://eventhoughimblind.com https://eventhoughimblind.wordpress.com; base-uri 'none'; form-action 'self'; object-src 'none'");self.end_headers();self.wfile.write(body)
     def do_GET(self):
         path=urlparse(self.path).path
-        if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','paid_services':False}).encode())
+        if path=='/api/health':return self.send(200,json.dumps({'ok':True,'name':'Talk to ETIB','provider':'rules-and-public-sources','speech_provider':'ElevenLabs','speech_uses_connected_account':True}).encode())
         if path=='/api/registry':return self.send(200,json.dumps(REGISTRY).encode())
         if path=='/api/audio':
             latest={}
@@ -264,7 +264,7 @@ class Handler(BaseHTTPRequestHandler):
                 if items:
                     item=dict(items[0]);item.setdefault('spotify_url',EXPERIENCE_SPOTIFY if key=='experience' else item['url']);latest[key]=cards([item])[0]
             return self.send(200,json.dumps(latest).encode())
-        mapping={'/':'index.html','/index.html':'index.html','/listening-cue.wav':'listening-cue.wav','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
+        mapping={'/speech-sdk.js':'speech-sdk.js','/managed-voice.js':'managed-voice.js','/rawAudioProcessor.js':'rawAudioProcessor.js','/audioConcatProcessor.js':'audioConcatProcessor.js','/libsamplerate.worklet.js':'libsamplerate.worklet.js','/':'index.html','/index.html':'index.html','/listening-cue.wav':'listening-cue.wav','/greeting.mp3':'greeting.mp3','/voice.js':'voice.js','/app.js':'app.js','/style.css':'style.css','/launcher.js':'launcher.js','/launcher-demo':'launcher-demo.html','/integration':'integration.html'}
         f=mapping.get(path)
         if not f:return self.send(404,b'{"error":"Not found"}')
         kind='audio/wav' if f.endswith('wav') else 'audio/mpeg' if f.endswith('mp3') else 'text/html; charset=utf-8' if f.endswith('html') else 'text/javascript; charset=utf-8' if f.endswith('js') else 'text/css; charset=utf-8'
@@ -292,6 +292,9 @@ class Handler(BaseHTTPRequestHandler):
         finally:CHAT_SLOTS.release()
 
 if __name__=='__main__':
+    if os.environ.get('ETIB_RUN_SPEECH_CHECK')=='1':
+        import runpy
+        POOL.submit(runpy.run_path,str(Path(__file__).resolve().parent/'tests/check_live_speech.py'),run_name='__main__')
     # Warm caches without delaying the first page or free-tier health checks.
     for key in LOADERS:POOL.submit(source,key)
     ThreadingHTTPServer(('0.0.0.0',int(os.environ.get('PORT','8080'))),Handler).serve_forever()

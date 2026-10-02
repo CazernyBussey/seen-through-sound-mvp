@@ -1,1 +1,1 @@
-# Python standard library only. No external packages or paid AI providers.
+# Python standard library only. Managed microphone speech uses the connected ElevenLabs account.

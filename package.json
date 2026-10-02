@@ -1,0 +1,25 @@
+{
+  "name": "talk-to-etib",
+  "version": "1.0.0",
+  "description": "Separate public prototype: https://talk-to-etib.onrender.com/",
+  "main": "app.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "build:speech": "node build-speech.cjs",
+    "test": "node tests/test_managed_voice.cjs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@alexanderolsen/libsamplerate-js": "2.1.2",
+    "@elevenlabs/client": "1.26.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2",
+    "ws": "8.22.0"
+  }
+}

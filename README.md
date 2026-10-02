@@ -6,11 +6,11 @@ Launcher test: https://talk-to-etib.onrender.com/launcher-demo
 
 Integration guide: https://talk-to-etib.onrender.com/integration
 
-The source is on the isolated `talk-to-etib-prototype` branch of the existing Seen Through Sound repository. Do not merge this standalone branch into the Seen Through Sound production branch: its root is a separate application. `main`, WordPress, ElevenLabs, Zapier, and the directory services were not modified.
+The source is on the isolated `talk-to-etib-prototype` branch of the existing Seen Through Sound repository. Do not merge this standalone branch into the Seen Through Sound production branch: its root is a separate application. `main`, WordPress, the original ElevenLabs agent, Zapier, and the directory services were not modified.
 
 ## Architecture
 
-Python standard library backend; semantic HTML, CSS and JavaScript frontend. No database creation, paid model provider, new API key, or account sign-in is needed. Public source adapters refresh on demand with a five-minute cache. Anonymous conversational state is kept only in the current page. Conversation requests are not written to application logs. Platform infrastructure logs may still exist. Optional device speech may contact the browser vendor’s speech service. Spotify is loaded only when an episode is requested. Media streams directly from the official provider.
+Python standard library backend; semantic HTML, CSS and JavaScript frontend. No database creation, new API key, or account sign-in is needed. Managed microphone recognition uses the connected ElevenLabs account. Public source adapters refresh on demand with a five-minute cache. Anonymous conversational state is kept only in the current page. Conversation requests are not written to application logs. Platform infrastructure logs may still exist. Microphone requests are processed by ElevenLabs. Spotify is loaded only when an episode is requested. Media streams directly from the official provider.
 
 Registry fields include name, aliases, owner, description, URL, category, action type, external status and verification metadata. Update `registry.json` for destinations. Public content and media adapters are in `server.py`. Provider output and third-party content are treated as data, never executable commands. URL actions are allowlisted. Payments, forms, email, account changes and deletion are not executed by this prototype.
 
@@ -110,3 +110,9 @@ Help and options now includes a labeled request field and Send request, supporti
 Speak now arms a Web Audio context in the user gesture. Recognition start plays one sine tone at 740Hz, peak gain 0.4, 170ms long with an attack and fade. No end tone, HTML audio cue, podcast source replacement or audio-session setting. Cancellation invalidates delayed tone work. The tone indicates recognition started, not that a transcript or microphone volume was measured.
 
 Final recognition results dispatch immediately after releasing capture, without waiting for audioend/end or the 1.5-second recovery timer. Stable interim text and manual Done speaking also dispatch directly. Empty capture resets after six seconds; recognized speech retains the eight-second ceiling and delayed-result handling. Startup now says Starting microphone until listening begins. Tests cover cue count/timing/cancellation and the actual voice-to-player handoff. Physical iPhone microphone and tone audibility remain unverified.
+
+## Managed microphone capture
+
+Speak now uses the pinned ElevenLabs JavaScript SDK and the isolated Talk to ETIB microphone agent. It opens one WebSocket session, plays one start tone after capture is ready, and releases capture before routing the final transcript to the existing player. Agent audio is muted. Empty requests and connection attempts time out after ten seconds; canceled and stale callbacks cannot submit requests. Self-hosted worklets and resampling WASM are bundled with the app. Rebuild with `npm ci && npm run build:speech`. Voice processing uses the connected account quota; recording is disabled and retention is configured to zero days. The original ETIB agent is unchanged.
+
+`tests/check_live_speech.py` is an explicit real-service check using synthetic public commands. Set ETIB_RUN_SPEECH_CHECK=1 only for a verification deployment, then set it back to 0; normal starts do not run paid speech checks. SDK lifecycle/player tests use deterministic callbacks and do not claim to verify an iPhone microphone.

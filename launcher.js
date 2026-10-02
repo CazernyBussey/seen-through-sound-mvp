@@ -15,7 +15,7 @@
  const close=document.createElement('button');close.type='button';close.textContent='Close';close.setAttribute('aria-label','Close Talk to ETIB and stop audio');
  const frame=document.createElement('iframe');frame.title='Talk to ETIB';frame.allow='microphone; autoplay';frame.id='etib-widget-frame';
  bar.append(heading,minimize,close);panel.append(bar,frame);document.body.append(panel);
- let loaded=false,ready=false,expanded=false,previous=null;
+ let loaded=false,ready=false,expanded=false,previous=null,playing=false;
  const dock=document.querySelector('[data-etib-bottom]');
  const feedback=dock?.querySelector('[data-etib-feedback]');
  const pauseButton=dock?.querySelector('[data-etib-pause]');const stopButton=dock?.querySelector('[data-etib-stop]');
@@ -26,14 +26,14 @@
  launchers.forEach(b=>{b.setAttribute('aria-controls',panel.id);b.setAttribute('aria-expanded','false');b.addEventListener('click',e=>{e.preventDefault();open();});});
  minimize.addEventListener('click',()=>hide());close.addEventListener('click',()=>hide(true));
  panel.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();hide();}});
- pauseButton?.addEventListener('click',()=>post('etib:command',{command:'pause'}));stopButton?.addEventListener('click',()=>post('etib:command',{command:'stop'}));
+ pauseButton?.addEventListener('click',()=>post('etib:command',{command:playing?'pause':'resume'}));stopButton?.addEventListener('click',()=>post('etib:command',{command:'stop'}));
  function approved(value){try{const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password||u.port&&u.port!=='443')return false;if(u.origin==='https://eventhoughimblind.com')return true;if(u.origin==='https://etib-community-connect-1.onrender.com'&&u.pathname==='/index.html')return [...u.searchParams.keys()].every(k=>['q','group'].includes(k))&&(!u.searchParams.has('group')||['media','business'].includes(u.searchParams.get('group')));return false;}catch{return false;}}
  window.addEventListener('message',async e=>{
   if(e.origin!==appOrigin||e.source!==frame.contentWindow)return;
   if(e.data?.type==='etib:ready'){ready=true;if(expanded)post('etib:initialize');}
   if(e.data?.type==='etib:close')hide(true);
   if(e.data?.type==='etib:minimized')hide();
-  if(e.data?.type==='etib:playback'){if(feedback)feedback.textContent=String(e.data.text||'Ready.').slice(0,250);if(pauseButton)pauseButton.hidden=!e.data.playing;if(stopButton)stopButton.hidden=!e.data.selected;}
+  if(e.data?.type==='etib:playback'){if(feedback)feedback.textContent=String(e.data.text||'Ready.').slice(0,250);playing=!!e.data.playing;if(pauseButton){pauseButton.hidden=!e.data.selected;pauseButton.textContent=playing?'Pause audio':'Resume audio';}if(stopButton)stopButton.hidden=!e.data.selected;}
   if(e.data?.type==='etib:navigate'){
    const value=e.data.url;
    try{const url=new URL(value);let allowed=approved(value);if(!allowed){const response=await fetch(appOrigin+'/api/registry');if(!response.ok)throw Error();const rows=await response.json();allowed=rows.some(x=>new URL(x.url).href===url.href);}

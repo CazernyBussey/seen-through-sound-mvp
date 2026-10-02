@@ -54,7 +54,7 @@ $('read-answer').addEventListener('click',()=>read($('answer').textContent,true)
 if('speechSynthesis'in window)window.speechSynthesis.getVoices();
 else{$('read-aloud').disabled=true;$('read-answer').disabled=true;$('silence').hidden=true;}
 const allowedParents=new Set([location.origin,'https://eventhoughimblind.com','https://eventhoughimblind.wordpress.com']);
-window.addEventListener('message',e=>{if(!allowedParents.has(e.origin)||e.source!==window.parent)return;if(e.data?.type==='etib:initialize'){embedded=true;parentOrigin=e.origin;$('close').hidden=false;requestInput.focus()}if(e.data?.type==='etib:stop'){stop();silence();voiceInput?.abort()}if(e.data?.type==='etib:minimize'){voiceInput?.abort()}if(e.data?.type==='etib:command'){if(e.data.command==='pause')pause();if(e.data.command==='stop')stop();}});
+window.addEventListener('message',e=>{if(!allowedParents.has(e.origin)||e.source!==window.parent)return;if(e.data?.type==='etib:initialize'){embedded=true;parentOrigin=e.origin;$('close').hidden=false;requestInput.focus()}if(e.data?.type==='etib:stop'){stop();silence();voiceInput?.abort()}if(e.data?.type==='etib:minimize'){voiceInput?.abort()}if(e.data?.type==='etib:command'){if(e.data.command==='pause')pause();if(e.data.command==='resume')void play();if(e.data.command==='stop')stop();}});
 let parentOrigin=location.origin;
 $('close').addEventListener('click',()=>{stop();silence();window.parent.postMessage({type:'etib:close'},parentOrigin)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&embedded){e.preventDefault();$('close').click()}});

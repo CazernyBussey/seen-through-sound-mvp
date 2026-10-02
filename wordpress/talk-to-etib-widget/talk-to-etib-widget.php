@@ -2,13 +2,13 @@
 /**
  * Plugin Name: Talk to ETIB Widget
  * Description: Accessible top and bottom voice-player controls for Even Though I'm Blind.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Even Though I'm Blind, Inc.
  */
 if (!defined('ABSPATH')) { exit; }
 function etib_widget_assets() {
-    wp_enqueue_style('etib-voice-widget', plugins_url('widget.css', __FILE__), array(), '1.0.0');
-    wp_enqueue_script('etib-voice-widget', plugins_url('widget.js', __FILE__), array(), '1.0.0', true);
+    wp_enqueue_style('etib-voice-widget', plugins_url('widget.css', __FILE__), array(), '1.0.1');
+    wp_enqueue_script('etib-voice-widget', plugins_url('widget.js', __FILE__), array(), '1.0.1', true);
 }
 add_action('wp_enqueue_scripts', 'etib_widget_assets');
 function etib_widget_body_class($classes) { $classes[] = 'etib-widget-enabled'; return $classes; }
